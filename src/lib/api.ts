@@ -58,6 +58,19 @@ export const authApi = {
         return response;
     },
 
+    sendOtp: async (data: { identifier: string; channel: string }) => {
+        return await api.post("/otp/send", data);
+    },
+
+    verifyOtpGeneral: async (data: { identifier: string; channel: string; code: string }) => {
+        const response = await api.post("/otp/verify", data);
+        return response.data.data; // contains the token needed for change-password
+    },
+
+    changePassword: async (data: { token: string; password: string }) => {
+        return await api.post("/auth/change-password", data);
+    },
+
     loginWithGoogle: async () => {
         const response = await api.post("/google/generate-url", {
             callback_url: `${window.location.origin}/auth/google/callback`,
@@ -76,10 +89,19 @@ export const authApi = {
     getCurrentUser: async () => {
         const response = await api.get("/user");
         const user = response.data.data;
-        if (user) {
-            useAuthStore.getState().setUser(user);
-        }
-        return response;
+        useAuthStore.getState().setUser(user);
+        return user;
+    },
+
+    updateProfile: async (data: any) => {
+        const response = await api.put("/user/profile", data);
+        await authApi.getCurrentUser(); // Refresh store
+        return response.data;
+    },
+
+    getSubscriptions: async () => {
+        const response = await api.get("/user/subscriptions");
+        return response.data.data;
     },
 
     initializeSubscription: async (data: {
