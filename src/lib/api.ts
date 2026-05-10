@@ -51,6 +51,7 @@ export const authApi = {
         const response = await api.post("/auth/generate-token", data);
         const { token } = response.data.data;
         useAuthStore.getState().setToken(token);
+        await authApi.getCurrentUser(); // Fetch user data immediately
         return response;
     },
 

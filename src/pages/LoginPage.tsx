@@ -80,8 +80,15 @@ export default function LoginPage() {
                 code: otp,
             });
 
-            // Redirect to dashboard or home
-            navigate("/choose-plan");
+            // Get the updated user state to check for plan
+            const updatedUser = useAuthStore.getState().user;
+
+            // Redirect based on plan status
+            if (updatedUser?.plan) {
+                navigate("/profile", { replace: true });
+            } else {
+                navigate("/choose-plan", { replace: true });
+            }
         } catch (err: any) {
             console.error("OTP Error:", err);
             setError(

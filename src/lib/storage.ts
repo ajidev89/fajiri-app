@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
 
-const SECRET_KEY = "fajiri-secret-key-2026"; // In a real app, this should be an env variable
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY; // In a real app, this should be an env variable
 
 export const storage = {
     set: (key: string, value: any) => {
