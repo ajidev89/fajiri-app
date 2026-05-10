@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight, Lock, ShieldCheck } from "lucide-react";
 import { storage } from "@/lib/storage";
 import { authApi } from "@/lib/api";
+import Visa from "@/assets/visa.png";
+import Mastercard from "@/assets/mastercard.png";
+import Verve from "@/assets/verve.png";
 import AuthHeader from "@/components/auth/layout/header/AuthHeader";
 
 export default function PaymentMethod() {
@@ -84,18 +87,20 @@ export default function PaymentMethod() {
                             {/* Card Network Placeholders */}
                             <div className="flex items-center gap-1">
                                 <img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+                                    src={Visa}
                                     alt="Visa"
                                     className="h-3 w-auto"
                                 />
                                 <img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                                    src={Mastercard}
                                     alt="Mastercard"
                                     className="h-5 w-auto"
                                 />
-                                <div className="text-[10px] font-black text-blue-800 italic">
-                                    Verve
-                                </div>
+                                <img
+                                    src={Verve}
+                                    alt="Verve"
+                                    className="h-3 w-auto"
+                                />
                             </div>
                         </div>
                     </div>
