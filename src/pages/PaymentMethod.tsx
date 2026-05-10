@@ -28,6 +28,8 @@ export default function PaymentMethod() {
             // If the API returns a redirect URL (for Stripe/Paystack)
             if (response.data.data?.authorization_url) {
                 window.location.href = response.data.data.authorization_url;
+            } else if (response.data.data?.url) {
+                window.location.href = response.data.data.url;
             } else {
                 // If it's a free plan or direct activation
                 navigate("/payment-success");
