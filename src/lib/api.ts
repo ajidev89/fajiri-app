@@ -18,6 +18,17 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            useAuthStore.getState().logout();
+            Optional: window.location.href = "/login";
+        }
+        return Promise.reject(error);
+    },
+);
+
 export const authApi = {
     login: async (data: {
         email?: string;
@@ -62,7 +73,11 @@ export const authApi = {
         return await api.post("/otp/send", data);
     },
 
-    verifyOtpGeneral: async (data: { identifier: string; channel: string; code: string }) => {
+    verifyOtpGeneral: async (data: {
+        identifier: string;
+        channel: string;
+        code: string;
+    }) => {
         const response = await api.post("/otp/verify", data);
         return response.data.data; // contains the token needed for change-password
     },
