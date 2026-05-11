@@ -4,6 +4,7 @@ import VerifyMagicLink from "@/pages/VerifyMagicLink";
 import ChoosePlan from "@/pages/ChoosePlan";
 import PaymentMethod from "@/pages/PaymentMethod";
 import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCallback from "@/pages/PaymentCallback";
 import GoogleCallback from "@/pages/GoogleCallback";
 import ForgotPassword from "@/pages/ForgotPassword";
 import VerifyPasswordOtp from "@/pages/VerifyPasswordOtp";
@@ -41,6 +42,10 @@ function App() {
                     <Route
                         path="/payment-success"
                         element={<PaymentSuccess />}
+                    />
+                    <Route
+                        path="/payment/callback"
+                        element={<PaymentCallback />}
                     />
                     <Route path="/profile" element={<Profile />} />
                 </Route>

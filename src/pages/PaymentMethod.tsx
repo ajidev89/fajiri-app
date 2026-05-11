@@ -24,8 +24,8 @@ export default function PaymentMethod() {
         try {
             const response = await authApi.initializeSubscription({
                 plan_id: selectedPlanId,
-                success_url: `${window.location.origin}/payment-success`,
-                cancel_url: `${window.location.origin}/payment-method`,
+                success_url: `${window.location.origin}/payment/callback?status=success`,
+                cancel_url: `${window.location.origin}/payment/callback?status=cancel`,
             });
 
             // If the API returns a redirect URL (for Stripe/Paystack)
