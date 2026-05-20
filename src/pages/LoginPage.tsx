@@ -126,7 +126,7 @@ export default function LoginPage() {
                     <img
                         src={logoImg}
                         alt="Fajiri Logo"
-                        className="h-8 w-auto"
+                        className="h-16 w-auto"
                     />
                 </Link>
             </div>
