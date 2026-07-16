@@ -49,6 +49,7 @@ export default function RegisterPage() {
         avatar: "",
         password: "",
         password_confirmation: "",
+        referral_code: "",
     });
 
     useEffect(() => {
@@ -176,6 +177,7 @@ export default function RegisterPage() {
                     value: email,
                 },
                 sub_account_type: formData.sub_account_type || null,
+                referral_code: formData.referral_code || null,
             };
 
             await authApi.register(payload);
@@ -451,7 +453,7 @@ export default function RegisterPage() {
                                         Identified Membership
                                     </option>
                                     <option value="project-membership">
-                                        Project Membership
+                                        Program Membership
                                     </option>
                                     <option value="corporate-membership">
                                         Corporate Membership
@@ -557,6 +559,23 @@ export default function RegisterPage() {
                                     value={formData.address}
                                     onChange={handleInputChange}
                                     placeholder="e.g. 6 Emmanuel Close"
+                                    className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label
+                                    htmlFor="referral_code"
+                                    className="text-slate-700 font-medium"
+                                >
+                                    Human Outreach Code (Referral Code)
+                                </Label>
+                                <Input
+                                    id="referral_code"
+                                    type="text"
+                                    value={formData.referral_code}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. FIM123456"
                                     className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
                                 />
                             </div>

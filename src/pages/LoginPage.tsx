@@ -124,7 +124,7 @@ export default function LoginPage() {
                     <p className="text-slate-500">
                         {otpSent
                             ? `We've sent a verification code to ${loginType === "email" ? formData.email : formData.phone}`
-                            : "Glad to see you again. Login to your account"}
+                            : "Glad to see you again. Login to your family member account"}
                     </p>
                 </div>
 
