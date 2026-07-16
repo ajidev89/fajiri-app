@@ -49,15 +49,17 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const loginData = loginType === "email" 
-                ? { email: formData.email, password: formData.password }
-                : { phone: formData.phone, password: formData.password };
-                
+            const loginData =
+                loginType === "email"
+                    ? { email: formData.email, password: formData.password }
+                    : { phone: formData.phone, password: formData.password };
+
             await authApi.login(loginData);
 
             setOtpSent(true);
             // The backend returns "Successfully sent otp"
         } catch (err: any) {
+            console.log(err);
             setError(
                 err.response?.data?.message ||
                     "Invalid login credentials. Please try again.",
@@ -74,7 +76,8 @@ export default function LoginPage() {
 
         try {
             await authApi.verifyOtp({
-                identifier: loginType === "email" ? formData.email : formData.phone,
+                identifier:
+                    loginType === "email" ? formData.email : formData.phone,
                 channel: loginType,
                 code: otp,
             });
@@ -98,7 +101,6 @@ export default function LoginPage() {
             setLoading(false);
         }
     };
-
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center pt-12 px-4 font-sans">
@@ -139,15 +141,25 @@ export default function LoginPage() {
                                 htmlFor={loginType}
                                 className="text-slate-700 font-medium"
                             >
-                                {loginType === "email" ? "Email Address" : "Phone Number"}
+                                {loginType === "email"
+                                    ? "Email Address"
+                                    : "Phone Number"}
                             </Label>
                             <Input
                                 id={loginType}
                                 type={loginType === "email" ? "email" : "tel"}
                                 required
-                                value={loginType === "email" ? formData.email : formData.phone}
+                                value={
+                                    loginType === "email"
+                                        ? formData.email
+                                        : formData.phone
+                                }
                                 onChange={handleInputChange}
-                                placeholder={loginType === "email" ? "Enter email address" : "Enter phone number (e.g. +234...)"}
+                                placeholder={
+                                    loginType === "email"
+                                        ? "Enter email address"
+                                        : "Enter phone number (e.g. +234...)"
+                                }
                                 className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
                             />
                         </div>
@@ -208,7 +220,7 @@ export default function LoginPage() {
                             )}
                         </Button>
 
-                        <div className="text-center hidden text-sm text-slate-600">
+                        <div className="text-center text-sm text-slate-600">
                             Don't have an account?{" "}
                             <Link
                                 to="/signup"
@@ -231,20 +243,44 @@ export default function LoginPage() {
                                 variant="outline"
                                 type="button"
                                 onClick={() => {
-                                    setLoginType(loginType === "email" ? "phone" : "email");
+                                    setLoginType(
+                                        loginType === "email"
+                                            ? "phone"
+                                            : "email",
+                                    );
                                     setError(null);
                                 }}
                                 className="w-full h-12 bg-white border-slate-200 text-slate-700 font-medium flex items-center justify-center gap-3 hover:bg-slate-50 transition-all"
                             >
                                 {loginType === "email" ? (
                                     <>
-                                        <Phone size={18} className="text-slate-600" />
+                                        <Phone
+                                            size={18}
+                                            className="text-slate-600"
+                                        />
                                         Continue with Phone
                                     </>
                                 ) : (
                                     <>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-600">
-                                            <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                                        <svg
+                                            width="18"
+                                            height="18"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="text-slate-600"
+                                        >
+                                            <rect
+                                                width="20"
+                                                height="16"
+                                                x="2"
+                                                y="4"
+                                                rx="2"
+                                            />
+                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                                         </svg>
                                         Continue with Email
                                     </>

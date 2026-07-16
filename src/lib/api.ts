@@ -35,7 +35,11 @@ export const authApi = {
         phone?: string;
         password: string;
     }) => {
-        const response = await api.post("/auth/login", data);
+        const loginData = { ...data };
+        if (loginData.email) {
+            loginData.email = loginData.email.trim().toLowerCase();
+        }
+        const response = await api.post("/auth/login", loginData);
         const user = response.data.data || {};
         if (user) {
             useAuthStore.getState().setUser(user);
@@ -48,7 +52,11 @@ export const authApi = {
         channel: string;
         code: string;
     }) => {
-        const response = await api.post("/auth/generate-token", data);
+        const verifyData = { ...data };
+        if (verifyData.channel === "email") {
+            verifyData.identifier = verifyData.identifier.trim().toLowerCase();
+        }
+        const response = await api.post("/auth/generate-token", verifyData);
         const { token } = response.data.data;
         useAuthStore.getState().setToken(token);
         await authApi.getCurrentUser(); // Fetch user data immediately
@@ -71,7 +79,11 @@ export const authApi = {
     },
 
     sendOtp: async (data: { identifier: string; channel: string }) => {
-        return await api.post("/otp/send", data);
+        const otpData = { ...data };
+        if (otpData.channel === "email") {
+            otpData.identifier = otpData.identifier.trim().toLowerCase();
+        }
+        return await api.post("/otp/send", otpData);
     },
 
     verifyOtpGeneral: async (data: {
@@ -79,7 +91,11 @@ export const authApi = {
         channel: string;
         code: string;
     }) => {
-        const response = await api.post("/otp/verify", data);
+        const verifyData = { ...data };
+        if (verifyData.channel === "email") {
+            verifyData.identifier = verifyData.identifier.trim().toLowerCase();
+        }
+        const response = await api.post("/otp/verify", verifyData);
         return response.data.data; // contains the token needed for change-password
     },
 
@@ -128,6 +144,25 @@ export const authApi = {
         const response = await api.post("/plans/initialize-subscription", data);
         return response;
     },
+
+    register: async (data: any) => {
+        const registerData = { ...data };
+        if (registerData.email?.value) {
+            registerData.email.value = registerData.email.value.trim().toLowerCase();
+        }
+        const response = await api.post("/auth/register", registerData);
+        const { token, user } = response.data.data || {};
+        if (token && user) {
+            useAuthStore.getState().setToken(token);
+            useAuthStore.getState().setUser(user);
+        }
+        return response;
+    },
+
+    getCountries: async () => {
+        return await api.get("/countries");
+    },
 };
 
 export default api;
+

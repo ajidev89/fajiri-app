@@ -9,6 +9,7 @@ import GoogleCallback from "@/pages/GoogleCallback";
 import ForgotPassword from "@/pages/ForgotPassword";
 import VerifyPasswordOtp from "@/pages/VerifyPasswordOtp";
 import ResetPassword from "@/pages/ResetPassword";
+import RegisterPage from "@/pages/RegisterPage";
 import Profile from "@/pages/Profile";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Toaster } from "sonner";
@@ -20,6 +21,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<RegisterPage />} />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route
                     path="/profile/complete-profile"
                     element={<VerifyMagicLink />}
@@ -34,6 +37,7 @@ function App() {
                     element={<VerifyPasswordOtp />}
                 />
                 <Route path="/reset-password" element={<ResetPassword />} />
+
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
