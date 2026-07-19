@@ -27,12 +27,27 @@ export default function LoginPage() {
     }, [isAuthenticated, user, navigate]);
 
     const [loginType, setLoginType] = useState<"email" | "phone">("email");
+    const [rememberMe, setRememberMe] = useState(false);
     // Form State
     const [formData, setFormData] = useState({
         email: "",
         phone: "",
         password: "",
     });
+
+    useEffect(() => {
+        const rememberedEmail = localStorage.getItem("fajiri_remembered_email");
+        const rememberedPhone = localStorage.getItem("fajiri_remembered_phone");
+        if (rememberedEmail) {
+            setFormData((prev) => ({ ...prev, email: rememberedEmail }));
+            setLoginType("email");
+            setRememberMe(true);
+        } else if (rememberedPhone) {
+            setFormData((prev) => ({ ...prev, phone: rememberedPhone }));
+            setLoginType("phone");
+            setRememberMe(true);
+        }
+    }, []);
 
     // OTP State
     const [otp, setOtp] = useState("");
@@ -55,6 +70,19 @@ export default function LoginPage() {
                     : { phone: formData.phone, password: formData.password };
 
             await authApi.login(loginData);
+
+            if (rememberMe) {
+                if (loginType === "email") {
+                    localStorage.setItem("fajiri_remembered_email", formData.email);
+                    localStorage.removeItem("fajiri_remembered_phone");
+                } else {
+                    localStorage.setItem("fajiri_remembered_phone", formData.phone);
+                    localStorage.removeItem("fajiri_remembered_email");
+                }
+            } else {
+                localStorage.removeItem("fajiri_remembered_email");
+                localStorage.removeItem("fajiri_remembered_phone");
+            }
 
             setOtpSent(true);
             // The backend returns "Successfully sent otp"
@@ -199,7 +227,22 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-end">
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    id="remember_me"
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    className="h-4 w-4 rounded border-slate-300 text-[#002B49] focus:ring-[#002B49]/20"
+                                />
+                                <Label
+                                    htmlFor="remember_me"
+                                    className="text-sm text-slate-600 font-medium cursor-pointer select-none"
+                                >
+                                    Remember me
+                                </Label>
+                            </div>
                             <Link
                                 to="/forgot-password"
                                 className="text-sm font-semibold text-[#002B49] hover:underline"

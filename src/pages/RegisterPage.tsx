@@ -32,6 +32,7 @@ export default function RegisterPage() {
     
     // Step 4 States
     const [loginOtpCode, setLoginOtpCode] = useState("");
+    const [consentChecked, setConsentChecked] = useState(false);
 
     // Step 2 States
     const [countries, setCountries] = useState<Country[]>([]);
@@ -162,6 +163,12 @@ export default function RegisterPage() {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!consentChecked) {
+            setError("You must give your consent to register.");
+            setLoading(false);
+            return;
+        }
 
         if (formData.password !== formData.password_confirmation) {
             setError("Passwords do not match.");
@@ -453,7 +460,7 @@ export default function RegisterPage() {
                                         Identified Membership
                                     </option>
                                     <option value="project-membership">
-                                        Program Membership
+                                        Program
                                     </option>
                                     <option value="corporate-membership">
                                         Corporate Membership
@@ -568,7 +575,7 @@ export default function RegisterPage() {
                                     htmlFor="referral_code"
                                     className="text-slate-700 font-medium"
                                 >
-                                    Human Outreach Code (Referral Code)
+                                    Human Outreach Code
                                 </Label>
                                 <Input
                                     id="referral_code"
@@ -682,6 +689,41 @@ export default function RegisterPage() {
                                         )}
                                     </button>
                                 </div>
+                            </div>
+
+                            <div className="flex items-start gap-2.5 my-4">
+                                <input
+                                    id="consentChecked"
+                                    type="checkbox"
+                                    required
+                                    checked={consentChecked}
+                                    onChange={(e) => setConsentChecked(e.target.checked)}
+                                    className="mt-1 h-4 w-4 rounded border-slate-300 text-[#002B49] focus:ring-[#002B49]/20"
+                                />
+                                <Label
+                                    htmlFor="consentChecked"
+                                    className="text-sm text-slate-600 font-normal leading-snug cursor-pointer select-none"
+                                >
+                                    I hereby give my consent to Fajiri to collect, process and store my personal data in accordance with the{" "}
+                                    <a
+                                        href="https://fajiri.org/privacy-policy/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[#002B49] font-medium hover:underline"
+                                    >
+                                        Privacy Policy
+                                    </a>{" "}
+                                    and{" "}
+                                    <a
+                                        href="https://fajiri.org/terms-of-use/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[#002B49] font-medium hover:underline"
+                                    >
+                                        Terms of Service
+                                    </a>
+                                    .
+                                </Label>
                             </div>
 
                             <Button
