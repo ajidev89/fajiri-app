@@ -700,7 +700,7 @@ export default function RegisterPage() {
                                     onChange={(e) => setConsentChecked(e.target.checked)}
                                     className="mt-1 h-4 w-4 rounded border-slate-300 text-[#002B49] focus:ring-[#002B49]/20"
                                 />
-                                <Label
+                                <label
                                     htmlFor="consentChecked"
                                     className="text-sm text-slate-600 font-normal leading-snug cursor-pointer select-none"
                                 >
@@ -723,7 +723,7 @@ export default function RegisterPage() {
                                         Terms of Service
                                     </a>
                                     .
-                                </Label>
+                                </label>
                             </div>
 
                             <Button
