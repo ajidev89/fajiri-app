@@ -29,7 +29,7 @@ export default function RegisterPage() {
     const [otpSent, setOtpSent] = useState(false);
     const [otpCode, setOtpCode] = useState("");
     const [verifiedToken, setVerifiedToken] = useState("");
-    
+
     // Step 4 States
     const [loginOtpCode, setLoginOtpCode] = useState("");
     const [consentChecked, setConsentChecked] = useState(false);
@@ -41,7 +41,7 @@ export default function RegisterPage() {
     const [formData, setFormData] = useState({
         first_name: "",
         last_name: "",
-        account_type: "identified-membership", // identified-membership|project-membership|corporate-membership
+        account_type: "identified-membership", // identified-membership|program-membership|corporate-membership
         sub_account_type: "" as string | null, // null|global-collaborators|global-sponsors
         country_id: "",
         dob: "",
@@ -221,7 +221,7 @@ export default function RegisterPage() {
             });
 
             toast.success("Logged in successfully!");
-            
+
             // Get the updated user state to check for plan
             const updatedUser = useAuthStore.getState().user;
 
@@ -459,8 +459,8 @@ export default function RegisterPage() {
                                     <option value="identified-membership">
                                         Identified Membership
                                     </option>
-                                    <option value="project-membership">
-                                        Program
+                                    <option value="program-membership">
+                                        Program Membership
                                     </option>
                                     <option value="corporate-membership">
                                         Corporate Membership
@@ -508,7 +508,9 @@ export default function RegisterPage() {
                                         onChange={handleInputChange}
                                         className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium text-sm"
                                     >
-                                        <option value="" disabled>Select a country</option>
+                                        <option value="" disabled>
+                                            Select a country
+                                        </option>
                                         {countries.map((c) => (
                                             <option key={c.id} value={c.id}>
                                                 {c.name}
@@ -606,8 +608,12 @@ export default function RegisterPage() {
                 ) : step === 3 ? (
                     <>
                         <div className="text-center mb-8">
-                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Secure Account</h1>
-                            <p className="text-slate-500">Set up a strong password for your new account</p>
+                            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                                Secure Account
+                            </h1>
+                            <p className="text-slate-500">
+                                Set up a strong password for your new account
+                            </p>
                         </div>
 
                         {error && (
@@ -697,14 +703,18 @@ export default function RegisterPage() {
                                     type="checkbox"
                                     required
                                     checked={consentChecked}
-                                    onChange={(e) => setConsentChecked(e.target.checked)}
+                                    onChange={(e) =>
+                                        setConsentChecked(e.target.checked)
+                                    }
                                     className="mt-1 h-4 w-4 rounded border-slate-300 text-[#002B49] focus:ring-[#002B49]/20"
                                 />
                                 <label
                                     htmlFor="consentChecked"
                                     className="text-sm text-slate-600 font-normal leading-snug cursor-pointer select-none"
                                 >
-                                    I hereby give my consent to Fajiri to collect, process and store my personal data in accordance with the{" "}
+                                    I hereby give my consent to Fajiri to
+                                    collect, process and store my personal data
+                                    in accordance with the{" "}
                                     <a
                                         href="https://fajiri.org/privacy-policy/"
                                         target="_blank"
@@ -750,9 +760,14 @@ export default function RegisterPage() {
                 ) : (
                     <>
                         <div className="text-center mb-8">
-                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Verify Login</h1>
+                            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                                Verify Login
+                            </h1>
                             <p className="text-slate-500">
-                                We've sent a 6-digit login verification code to <span className="font-semibold text-slate-900">{email}</span>
+                                We've sent a 6-digit login verification code to{" "}
+                                <span className="font-semibold text-slate-900">
+                                    {email}
+                                </span>
                             </p>
                         </div>
 
@@ -762,15 +777,25 @@ export default function RegisterPage() {
                             </div>
                         )}
 
-                        <form onSubmit={handleVerifyLoginOtp} className="space-y-6">
+                        <form
+                            onSubmit={handleVerifyLoginOtp}
+                            className="space-y-6"
+                        >
                             <div className="space-y-2">
-                                <Label htmlFor="loginOtpCode" className="text-slate-700 font-medium">Verification Code</Label>
+                                <Label
+                                    htmlFor="loginOtpCode"
+                                    className="text-slate-700 font-medium"
+                                >
+                                    Verification Code
+                                </Label>
                                 <Input
                                     id="loginOtpCode"
                                     type="text"
                                     required
                                     value={loginOtpCode}
-                                    onChange={(e) => setLoginOtpCode(e.target.value)}
+                                    onChange={(e) =>
+                                        setLoginOtpCode(e.target.value)
+                                    }
                                     placeholder="Enter 6-digit code"
                                     className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors text-center text-2xl tracking-[0.5em] font-bold"
                                     maxLength={6}
@@ -782,7 +807,11 @@ export default function RegisterPage() {
                                 disabled={loading || loginOtpCode.length < 6}
                                 className="w-full h-12 bg-[#002B49] hover:bg-[#001F35] text-white font-semibold text-base transition-all"
                             >
-                                {loading ? <Loader2 className="animate-spin mr-2" /> : "Verify and Login"}
+                                {loading ? (
+                                    <Loader2 className="animate-spin mr-2" />
+                                ) : (
+                                    "Verify and Login"
+                                )}
                             </Button>
                         </form>
                     </>
