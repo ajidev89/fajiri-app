@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Phone, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logoImg from "@/assets/fajiri-logo.png";
 import { authApi } from "@/lib/api";
@@ -26,25 +26,17 @@ export default function LoginPage() {
         }
     }, [isAuthenticated, user, navigate]);
 
-    const [loginType, setLoginType] = useState<"email" | "phone">("email");
     const [rememberMe, setRememberMe] = useState(false);
     // Form State
     const [formData, setFormData] = useState({
         email: "",
-        phone: "",
         password: "",
     });
 
     useEffect(() => {
         const rememberedEmail = localStorage.getItem("fajiri_remembered_email");
-        const rememberedPhone = localStorage.getItem("fajiri_remembered_phone");
         if (rememberedEmail) {
             setFormData((prev) => ({ ...prev, email: rememberedEmail }));
-            setLoginType("email");
-            setRememberMe(true);
-        } else if (rememberedPhone) {
-            setFormData((prev) => ({ ...prev, phone: rememberedPhone }));
-            setLoginType("phone");
             setRememberMe(true);
         }
     }, []);
@@ -64,24 +56,14 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const loginData =
-                loginType === "email"
-                    ? { email: formData.email, password: formData.password }
-                    : { phone: formData.phone, password: formData.password };
+            const loginData = { email: formData.email, password: formData.password };
 
             await authApi.login(loginData);
 
             if (rememberMe) {
-                if (loginType === "email") {
-                    localStorage.setItem("fajiri_remembered_email", formData.email);
-                    localStorage.removeItem("fajiri_remembered_phone");
-                } else {
-                    localStorage.setItem("fajiri_remembered_phone", formData.phone);
-                    localStorage.removeItem("fajiri_remembered_email");
-                }
+                localStorage.setItem("fajiri_remembered_email", formData.email);
             } else {
                 localStorage.removeItem("fajiri_remembered_email");
-                localStorage.removeItem("fajiri_remembered_phone");
             }
 
             setOtpSent(true);
@@ -104,9 +86,8 @@ export default function LoginPage() {
 
         try {
             await authApi.verifyOtp({
-                identifier:
-                    loginType === "email" ? formData.email : formData.phone,
-                channel: loginType,
+                identifier: formData.email,
+                channel: "email",
                 code: otp,
             });
 
@@ -151,7 +132,7 @@ export default function LoginPage() {
                     </h1>
                     <p className="text-slate-500">
                         {otpSent
-                            ? `We've sent a verification code to ${loginType === "email" ? formData.email : formData.phone}`
+                            ? `We've sent a verification code to ${formData.email}`
                             : "Glad to see you again. Login to your family member account"}
                     </p>
                 </div>
@@ -166,28 +147,18 @@ export default function LoginPage() {
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
                             <Label
-                                htmlFor={loginType}
+                                htmlFor="email"
                                 className="text-slate-700 font-medium"
                             >
-                                {loginType === "email"
-                                    ? "Email Address"
-                                    : "Phone Number"}
+                                Email Address
                             </Label>
                             <Input
-                                id={loginType}
-                                type={loginType === "email" ? "email" : "tel"}
+                                id="email"
+                                type="email"
                                 required
-                                value={
-                                    loginType === "email"
-                                        ? formData.email
-                                        : formData.phone
-                                }
+                                value={formData.email}
                                 onChange={handleInputChange}
-                                placeholder={
-                                    loginType === "email"
-                                        ? "Enter email address"
-                                        : "Enter phone number (e.g. +234...)"
-                                }
+                                placeholder="Enter email address"
                                 className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
                             />
                         </div>
@@ -273,63 +244,7 @@ export default function LoginPage() {
                             </Link>
                         </div>
 
-                        <div className="relative flex items-center py-4">
-                            <div className="flex-grow border-t border-slate-200"></div>
-                            <span className="flex-shrink mx-4 text-slate-400 text-sm">
-                                or
-                            </span>
-                            <div className="flex-grow border-t border-slate-200"></div>
-                        </div>
 
-                        <div className="space-y-3">
-                            <Button
-                                variant="outline"
-                                type="button"
-                                onClick={() => {
-                                    setLoginType(
-                                        loginType === "email"
-                                            ? "phone"
-                                            : "email",
-                                    );
-                                    setError(null);
-                                }}
-                                className="w-full h-12 bg-white border-slate-200 text-slate-700 font-medium flex items-center justify-center gap-3 hover:bg-slate-50 transition-all"
-                            >
-                                {loginType === "email" ? (
-                                    <>
-                                        <Phone
-                                            size={18}
-                                            className="text-slate-600"
-                                        />
-                                        Continue with Phone
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg
-                                            width="18"
-                                            height="18"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            className="text-slate-600"
-                                        >
-                                            <rect
-                                                width="20"
-                                                height="16"
-                                                x="2"
-                                                y="4"
-                                                rx="2"
-                                            />
-                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                                        </svg>
-                                        Continue with Email
-                                    </>
-                                )}
-                            </Button>
-                        </div>
                     </form>
                 ) : (
                     <form onSubmit={handleVerifyOtp} className="space-y-6">
