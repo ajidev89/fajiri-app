@@ -70,7 +70,7 @@ export default function PaymentCallback() {
 
         if (status === "success") {
             setState("success");
-            setMessage("Your subscription has been successfully activated.");
+            setMessage("Your contribution has been successfully activated.");
         } else if (status === "cancel") {
             setState("cancelled");
             setMessage("The payment process was cancelled. No charges were made.");
@@ -89,7 +89,7 @@ export default function PaymentCallback() {
         } else if (sessionId) {
             // Stripe success redirect usually comes with a session_id
             setState("success");
-            setMessage("Subscription confirmed. Welcome aboard!");
+            setMessage("Contribution confirmed. Welcome aboard!");
         } else {
             // Default to success if no specific status but we landed here
             // (Often the case for simple redirects)

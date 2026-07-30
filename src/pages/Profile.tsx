@@ -182,7 +182,7 @@ function BillingTab({ user }: { user: any }) {
         <Card className="border-slate-100 shadow-sm rounded-2xl overflow-hidden">
             <CardHeader className="bg-white border-b border-slate-50 p-6">
                 <CardTitle className="text-xl font-bold">
-                    Current Subscription
+                    Current Contribution
                 </CardTitle>
                 <CardDescription>
                     View and manage your active membership plan.
@@ -219,7 +219,7 @@ function BillingTab({ user }: { user: any }) {
                 ) : (
                     <div className="text-center py-12">
                         <p className="text-slate-500 mb-6">
-                            You don't have an active subscription.
+                            You don't have an active contribution.
                         </p>
                         <Button
                             onClick={() => navigate("/choose-plan")}
@@ -273,7 +273,7 @@ function HistoryTab() {
                     Membership History
                 </CardTitle>
                 <CardDescription>
-                    A record of all your plan subscriptions and renewals.
+                    A record of all your plan contributions and renewals.
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -357,7 +357,7 @@ function HistoryTab() {
                             <HistoryIcon size={32} />
                         </div>
                         <p className="text-slate-500 font-medium">
-                            No subscription history found.
+                            No contribution history found.
                         </p>
                     </div>
                 )}
