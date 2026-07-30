@@ -19,6 +19,7 @@ import {
     History as HistoryIcon,
     Loader2,
     CheckCircle2,
+    Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { authApi } from "@/lib/api";
@@ -92,6 +93,20 @@ function InformationTab({ user }: { user: any }) {
     const [lastName, setLastName] = useState(user?.profile?.last_name || "");
     const [phone, setPhone] = useState(user?.phone || "");
 
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return "-";
+        return new Date(dateString).toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success("Copied to clipboard!");
+    };
+
     const handleSaveChanges = async () => {
         setLoading(true);
         try {
@@ -112,6 +127,7 @@ function InformationTab({ user }: { user: any }) {
     };
 
     return (
+        <>
         <Card className="border-slate-100 shadow-sm rounded-2xl overflow-hidden">
             <CardHeader className="bg-white border-b border-slate-50 p-6">
                 <CardTitle className="text-xl font-bold">
@@ -171,6 +187,77 @@ function InformationTab({ user }: { user: any }) {
                 </div>
             </CardContent>
         </Card>
+
+        <Card className="border-slate-100 shadow-sm rounded-2xl overflow-hidden mt-8">
+            <CardHeader className="bg-white border-b border-slate-50 p-6">
+                <CardTitle className="text-xl font-bold">
+                    Basic Information
+                </CardTitle>
+                <CardDescription>
+                    Your account information and active plan details.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Member ID</p>
+                        <p className="font-semibold text-slate-900">{user?.member_id || "-"}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Account Plan</p>
+                        <p className="font-semibold text-slate-900 capitalize">{user?.account_type?.replace(/-/g, ' ') || "-"}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Gender</p>
+                        <p className="font-semibold text-slate-900 capitalize">{user?.profile?.gender || "-"}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Date of Birth</p>
+                        <p className="font-semibold text-slate-900">{formatDate(user?.profile?.dob)}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Address</p>
+                        <p className="font-semibold text-slate-900">{user?.profile?.address || "-"}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Occupation</p>
+                        <p className="font-semibold text-slate-900">{user?.profile?.occupation || "-"}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Date Joined</p>
+                        <p className="font-semibold text-slate-900">{formatDate(user?.created_at)}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Active Plan</p>
+                        <p className="font-semibold text-slate-900">{user?.plan?.name || "-"}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-slate-500 font-medium">Expiry Plan Date</p>
+                        <p className="font-semibold text-slate-900">{formatDate(user?.plan?.expires_at)}</p>
+                    </div>
+                </div>
+
+                {user?.referral_code && (
+                    <div className="pt-4 mt-4 border-t border-slate-100">
+                        <p className="text-sm text-slate-500 font-medium mb-1">Referral Link</p>
+                        <div className="flex items-center gap-2 max-w-full">
+                            <div className="bg-slate-50 px-3 py-2 rounded-lg text-sm text-slate-900 font-medium truncate flex-1 border border-slate-100">
+                                https://app.fajiri.com/register?ref={user.referral_code}
+                            </div>
+                            <Button 
+                                variant="outline" 
+                                size="icon" 
+                                onClick={() => handleCopy(`https://app.fajiri.com/register?ref=${user.referral_code}`)}
+                                className="shrink-0"
+                            >
+                                <Copy className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+        </>
     );
 }
 
