@@ -21,7 +21,7 @@ export default function LoginPage() {
             if (user?.plan) {
                 navigate("/profile", { replace: true });
             } else {
-                navigate("/choose-plan", { replace: true });
+                navigate("/choose-account-type", { replace: true });
             }
         }
     }, [isAuthenticated, user, navigate]);
@@ -117,7 +117,7 @@ export default function LoginPage() {
             if (updatedUser?.plan) {
                 navigate("/profile", { replace: true });
             } else {
-                navigate("/choose-plan", { replace: true });
+                navigate("/choose-account-type", { replace: true });
             }
         } catch (err: any) {
             console.error("OTP Error:", err);

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logoImg from "@/assets/fajiri-logo.png";
 import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -17,6 +17,10 @@ interface Country {
 
 export default function RegisterPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const initialRef = queryParams.get("ref") || "";
+
     const { isAuthenticated, user } = useAuthStore();
 
     // Flow Step: 1 = Email Verification, 2 = Form Details, 3 = Password Setup, 4 = Login OTP Verification
@@ -45,12 +49,13 @@ export default function RegisterPage() {
         sub_account_type: "" as string | null, // null|global-collaborators|global-sponsors
         country_id: "",
         dob: "",
+        phone: "",
         address: "",
         occupation: "",
         avatar: "",
         password: "",
         password_confirmation: "",
-        referral_code: "",
+        referral_code: initialRef,
     });
 
     useEffect(() => {
@@ -58,7 +63,7 @@ export default function RegisterPage() {
             if (user?.plan) {
                 navigate("/profile", { replace: true });
             } else {
-                navigate("/choose-plan", { replace: true });
+                navigate("/choose-account-type", { replace: true });
             }
         }
     }, [isAuthenticated, user, navigate]);
@@ -183,6 +188,7 @@ export default function RegisterPage() {
                     token: verifiedToken,
                     value: email,
                 },
+                phone: formData.phone ? { value: formData.phone } : undefined,
                 sub_account_type: formData.sub_account_type || null,
                 referral_code: formData.referral_code || null,
             };
@@ -229,7 +235,7 @@ export default function RegisterPage() {
             if (updatedUser?.plan) {
                 navigate("/profile", { replace: true });
             } else {
-                navigate("/choose-plan", { replace: true });
+                navigate("/choose-account-type", { replace: true });
             }
         } catch (err: any) {
             console.error("Login OTP Error:", err);
@@ -534,6 +540,24 @@ export default function RegisterPage() {
                                         className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label
+                                    htmlFor="phone"
+                                    className="text-slate-700 font-medium"
+                                >
+                                    Phone Number
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. +2348000000000"
+                                    className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                                />
                             </div>
 
                             <div className="space-y-1.5">

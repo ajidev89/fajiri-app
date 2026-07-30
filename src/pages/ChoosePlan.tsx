@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Check, ArrowRight } from "lucide-react";
+import { Loader2, Check, ArrowRight, ChevronLeft } from "lucide-react";
 import { authApi } from "@/lib/api";
 import { storage } from "@/lib/storage";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -84,7 +84,16 @@ export default function ChoosePlan() {
                 <AuthHeader />
             </header>
 
-            <main className="container mx-auto px-6 pt-32 pb-24 text-center">
+            <main className="container mx-auto px-6 pt-32 pb-24 text-center relative">
+                {/* Back Button */}
+                <button 
+                    onClick={() => navigate("/choose-account-type")} 
+                    className="absolute left-6 top-32 p-2 -ml-2 text-slate-400 hover:text-[#002B49] transition-colors rounded-full hover:bg-slate-50 flex items-center gap-2 font-semibold text-sm"
+                >
+                    <ChevronLeft className="h-5 w-5" />
+                    <span className="hidden md:inline">Back</span>
+                </button>
+
                 {/* Onboarding Steps */}
                 <div className="mb-16">
                     <div className="flex items-center justify-center gap-2 mb-4">

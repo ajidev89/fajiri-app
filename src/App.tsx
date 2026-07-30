@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "@/pages/LoginPage";
 import VerifyMagicLink from "@/pages/VerifyMagicLink";
+import ChooseAccountType from "@/pages/ChooseAccountType";
 import ChoosePlan from "@/pages/ChoosePlan";
 import PaymentMethod from "@/pages/PaymentMethod";
 import PaymentSuccess from "@/pages/PaymentSuccess";
@@ -41,6 +42,7 @@ function App() {
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
+                    <Route path="/choose-account-type" element={<ChooseAccountType />} />
                     <Route path="/choose-plan" element={<ChoosePlan />} />
                     <Route path="/payment-method" element={<PaymentMethod />} />
                     <Route

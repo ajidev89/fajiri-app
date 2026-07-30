@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Lock, ShieldCheck } from "lucide-react";
+import { ChevronRight, Lock, ShieldCheck, ChevronLeft } from "lucide-react";
 import { storage } from "@/lib/storage";
 import { authApi } from "@/lib/api";
 import Visa from "@/assets/visa.png";
@@ -47,7 +47,16 @@ export default function PaymentMethod() {
         <div className="min-h-screen bg-white font-sans text-slate-900">
             <AuthHeader />
 
-            <main className="container mx-auto px-6 pt-12 pb-24 text-center max-w-2xl">
+            <main className="container mx-auto px-6 pt-12 pb-24 text-center max-w-2xl relative">
+                {/* Back Button */}
+                <button 
+                    onClick={handleBack} 
+                    className="absolute left-6 top-12 p-2 -ml-2 text-slate-400 hover:text-[#002B49] transition-colors rounded-full hover:bg-slate-50 flex items-center gap-2 font-semibold text-sm"
+                >
+                    <ChevronLeft className="h-5 w-5" />
+                    <span className="hidden md:inline">Back</span>
+                </button>
+
                 {/* Onboarding Steps */}
                 <div className="mb-12">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-4">
