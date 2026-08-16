@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OtpInput } from "@/components/ui/otp-input";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logoImg from "@/assets/fajiri-logo.png";
@@ -335,24 +336,22 @@ export default function RegisterPage() {
                                 onSubmit={handleVerifyOtp}
                                 className="space-y-6"
                             >
-                                <div className="space-y-2">
-                                    <Label
-                                        htmlFor="otpCode"
-                                        className="text-slate-700 font-medium"
-                                    >
-                                        Verification Code
-                                    </Label>
-                                    <Input
-                                        id="otpCode"
-                                        type="text"
-                                        required
+                                <div className="space-y-3 text-center">
+                                    <div className="space-y-1">
+                                        <Label
+                                            htmlFor="otpCode"
+                                            className="text-slate-800 font-bold text-sm"
+                                        >
+                                            Enter Code
+                                        </Label>
+                                        <p className="text-xs text-slate-500 font-medium">
+                                            Please enter the 6-digit verification code sent to your email
+                                        </p>
+                                    </div>
+                                    <OtpInput
                                         value={otpCode}
-                                        onChange={(e) =>
-                                            setOtpCode(e.target.value)
-                                        }
-                                        placeholder="Enter 6-digit code"
-                                        className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors text-center text-2xl tracking-[0.5em] font-bold"
-                                        maxLength={6}
+                                        onChange={setOtpCode}
+                                        disabled={loading}
                                     />
                                 </div>
 
@@ -781,24 +780,22 @@ export default function RegisterPage() {
                             onSubmit={handleVerifyLoginOtp}
                             className="space-y-6"
                         >
-                            <div className="space-y-2">
-                                <Label
-                                    htmlFor="loginOtpCode"
-                                    className="text-slate-700 font-medium"
-                                >
-                                    Verification Code
-                                </Label>
-                                <Input
-                                    id="loginOtpCode"
-                                    type="text"
-                                    required
+                            <div className="space-y-3 text-center">
+                                <div className="space-y-1">
+                                    <Label
+                                        htmlFor="loginOtpCode"
+                                        className="text-slate-800 font-bold text-sm"
+                                    >
+                                        Enter Code
+                                    </Label>
+                                    <p className="text-xs text-slate-500 font-medium">
+                                        Please enter the 6-digit verification code sent to your email
+                                    </p>
+                                </div>
+                                <OtpInput
                                     value={loginOtpCode}
-                                    onChange={(e) =>
-                                        setLoginOtpCode(e.target.value)
-                                    }
-                                    placeholder="Enter 6-digit code"
-                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors text-center text-2xl tracking-[0.5em] font-bold"
-                                    maxLength={6}
+                                    onChange={setLoginOtpCode}
+                                    disabled={loading}
                                 />
                             </div>
 

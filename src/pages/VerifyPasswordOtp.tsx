@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OtpInput } from "@/components/ui/otp-input";
 import { Loader2, ArrowLeft } from "lucide-react";
 import logoImg from "@/assets/fajiri-logo.png";
 import { authApi } from "@/lib/api";
@@ -65,17 +65,19 @@ export default function VerifyPasswordOtp() {
                 )}
 
                 <form onSubmit={handleVerify} className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="otp" className="text-slate-700 font-medium">Verification Code</Label>
-                        <Input
-                            id="otp"
-                            type="text"
-                            required
+                    <div className="space-y-3 text-center">
+                        <div className="space-y-1">
+                            <Label htmlFor="otp" className="text-slate-800 font-bold text-sm">
+                                Enter Code
+                            </Label>
+                            <p className="text-xs text-slate-500 font-medium">
+                                Please enter the 6-digit verification code sent to your email
+                            </p>
+                        </div>
+                        <OtpInput
                             value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            placeholder="Enter 6-digit code"
-                            className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors text-center text-2xl tracking-[0.5em] font-bold"
-                            maxLength={6}
+                            onChange={setOtp}
+                            disabled={loading}
                         />
                     </div>
 
