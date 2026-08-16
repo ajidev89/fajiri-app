@@ -59,20 +59,20 @@ function FlutterwaveLogo() {
     );
 }
 
-function NombaLogo() {
-    return (
-        <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-all">
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" rx="5" fill="#FFB703" />
-                <path
-                    d="M7 16.5V7.5H9.5L14.5 13.5V7.5H17V16.5H14.5L9.5 10.5V16.5H7Z"
-                    fill="#023047"
-                />
-            </svg>
-            <span className="text-xs font-black tracking-tight text-slate-800">nomba</span>
-        </div>
-    );
-}
+// function NombaLogo() {
+//     return (
+//         <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-all">
+//             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+//                 <rect width="24" height="24" rx="5" fill="#FFB703" />
+//                 <path
+//                     d="M7 16.5V7.5H9.5L14.5 13.5V7.5H17V16.5H14.5L9.5 10.5V16.5H7Z"
+//                     fill="#023047"
+//                 />
+//             </svg>
+//             <span className="text-xs font-black tracking-tight text-slate-800">nomba</span>
+//         </div>
+//     );
+// }
 
 function PayPalLogo() {
     return (
@@ -141,12 +141,12 @@ export default function PaymentMethod() {
             badge: "Popular",
             renderLogos: () => <FlutterwaveLogo />,
         },
-        {
-            id: "nomba",
-            name: "Nomba",
-            description: "Quick checkout via Card, Bank Transfer, or QR payment",
-            renderLogos: () => <NombaLogo />,
-        },
+        // {
+        //     id: "nomba",
+        //     name: "Nomba",
+        //     description: "Quick checkout via Card, Bank Transfer, or QR payment",
+        //     renderLogos: () => <NombaLogo />,
+        // },
         {
             id: "paypal",
             name: "PayPal",
@@ -203,29 +203,32 @@ export default function PaymentMethod() {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900">
-            <AuthHeader />
+        <div className="min-h-screen bg-white font-sans text-slate-900 flex flex-col overflow-x-hidden w-full">
+            <AuthHeader className="sticky top-0 z-50" />
 
-            <main className="container mx-auto px-6 pt-12 pb-24 text-center max-w-2xl relative">
-                {/* Back Button */}
-                <button
-                    onClick={handleBack}
-                    className="absolute left-6 top-12 p-2 -ml-2 text-slate-400 hover:text-[#002B49] transition-colors rounded-full hover:bg-slate-50 flex items-center gap-2 font-semibold text-sm cursor-pointer"
-                >
-                    <ChevronLeft className="h-5 w-5" />
-                    <span className="hidden md:inline">Back</span>
-                </button>
-
-                {/* Onboarding Steps */}
-                <div className="mb-10">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-4">
+            <main className="container mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-20 sm:pb-24 text-center max-w-2xl relative flex-1 w-full">
+                {/* Back Button & Step Row */}
+                <div className="relative flex items-center justify-center mb-6 sm:mb-8">
+                    <button
+                        onClick={handleBack}
+                        className="absolute left-0 p-2 text-slate-400 hover:text-[#002B49] transition-colors rounded-full hover:bg-slate-50 flex items-center gap-1.5 font-semibold text-sm cursor-pointer"
+                        aria-label="Go back"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                        <span className="hidden sm:inline">Back</span>
+                    </button>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                         Step 3 of 3
                     </span>
-                    <h1 className="text-4xl font-extrabold text-slate-900 mb-5 tracking-tight">
+                </div>
+
+                {/* Onboarding Steps */}
+                <div className="mb-8 sm:mb-10">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 sm:mb-4 tracking-tight">
                         Choose how to pay
                     </h1>
 
-                    <div className="space-y-2 text-slate-500 font-medium">
+                    <div className="space-y-1.5 text-xs sm:text-sm text-slate-500 font-medium max-w-md mx-auto">
                         <p>
                             Your payment is encrypted and you can change how you pay anytime.
                         </p>
@@ -236,13 +239,13 @@ export default function PaymentMethod() {
                 </div>
 
                 {/* Encryption Badge */}
-                <div className="flex justify-end items-center gap-2 mb-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div className="flex justify-end items-center gap-1.5 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <span>End-to-end encrypted</span>
                     <Lock className="h-3 w-3" />
                 </div>
 
                 {/* Payment Options List */}
-                <div className="space-y-3.5 text-left">
+                <div className="space-y-3 sm:space-y-3.5 text-left">
                     {paymentGateways.map((gateway) => {
                         const isLoading = loadingGateway === gateway.id;
                         const isDisabled = loadingGateway !== null && !isLoading;
@@ -251,33 +254,33 @@ export default function PaymentMethod() {
                             <div
                                 key={gateway.id}
                                 onClick={() => !loadingGateway && handleSelectPayment(gateway.id)}
-                                className={`group relative w-full bg-white border-2 rounded-2xl p-5 md:p-6 flex items-center justify-between transition-all duration-200 ${
+                                className={`group relative w-full bg-white border-2 rounded-2xl p-4 sm:p-5 md:p-6 flex items-center justify-between transition-all duration-200 ${
                                     isLoading
                                         ? "border-[#002B49] bg-slate-50/50 shadow-md ring-2 ring-[#002B49]/10"
                                         : isDisabled
                                         ? "opacity-50 border-slate-100 cursor-not-allowed"
-                                        : "border-slate-100 hover:border-[#002B49] hover:shadow-lg cursor-pointer hover:-translate-y-0.5"
+                                        : "border-slate-100 hover:border-[#002B49] hover:shadow-lg cursor-pointer md:hover:-translate-y-0.5"
                                 }`}
                             >
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 flex-1 mr-4">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2.5">
-                                            <span className="text-base font-bold text-slate-800 group-hover:text-[#002B49] transition-colors">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 flex-1 min-w-0 mr-3">
+                                    <div className="space-y-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="text-sm sm:text-base font-bold text-slate-800 group-hover:text-[#002B49] transition-colors">
                                                 {gateway.name}
                                             </span>
                                             {gateway.badge && (
-                                                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full group-hover:bg-[#002B49]/10 group-hover:text-[#002B49] transition-colors">
+                                                <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full group-hover:bg-[#002B49]/10 group-hover:text-[#002B49] transition-colors shrink-0">
                                                     {gateway.badge}
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-xs text-slate-400 font-medium">
+                                        <p className="text-xs text-slate-400 font-medium break-words">
                                             {gateway.description}
                                         </p>
                                     </div>
 
                                     {/* Logos / Brand Icons */}
-                                    <div className="flex items-center">
+                                    <div className="flex items-center shrink-0">
                                         {gateway.renderLogos()}
                                     </div>
                                 </div>
@@ -296,20 +299,20 @@ export default function PaymentMethod() {
                 </div>
 
                 {/* Secure Badge */}
-                <div className="mt-14 flex flex-col items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-green-50 flex items-center justify-center">
-                        <ShieldCheck className="h-6 w-6 text-green-600" />
+                <div className="mt-10 sm:mt-14 flex flex-col items-center gap-2.5 sm:gap-3">
+                    <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-green-50 flex items-center justify-center">
+                        <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                     </div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[220px]">
+                    <p className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[220px]">
                         Guaranteed secure transactions with 256-bit encryption
                     </p>
                 </div>
 
                 {/* Navigation Actions */}
-                <div className="mt-10 flex justify-center">
+                <div className="mt-8 sm:mt-10 flex justify-center">
                     <button
                         onClick={handleBack}
-                        className="text-sm font-bold text-[#002B49] hover:underline cursor-pointer"
+                        className="text-xs sm:text-sm font-bold text-[#002B49] hover:underline cursor-pointer"
                     >
                         Go back to plans
                     </button>

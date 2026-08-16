@@ -39,25 +39,23 @@ export default function ChooseAccountType() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50/30 font-sans text-slate-900 selection:bg-[#002B49]/10">
-            <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-                <AuthHeader />
-            </header>
+        <div className="min-h-screen bg-slate-50/30 font-sans text-slate-900 selection:bg-[#002B49]/10 flex flex-col overflow-x-hidden w-full">
+            <AuthHeader className="sticky top-0 z-50" />
 
-            <main className="container mx-auto px-6 pt-32 pb-24 text-center max-w-xl">
-                <div className="mb-10">
+            <main className="container mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-20 sm:pb-24 text-center max-w-xl flex-1 w-full">
+                <div className="mb-8 sm:mb-10">
                     <div className="flex items-center justify-center gap-2 mb-4">
-                        <div className="h-1.5 w-12 rounded-full bg-[#002B49]"></div>
-                        <div className="h-1.5 w-8 rounded-full bg-slate-200"></div>
-                        <div className="h-1.5 w-8 rounded-full bg-slate-200"></div>
+                        <div className="h-1.5 w-8 sm:w-12 rounded-full bg-[#002B49]"></div>
+                        <div className="h-1.5 w-6 sm:w-8 rounded-full bg-slate-200"></div>
+                        <div className="h-1.5 w-6 sm:w-8 rounded-full bg-slate-200"></div>
                     </div>
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] block mb-2">
                         Step 1 of 3
                     </span>
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-4">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-3 sm:mb-4">
                         Confirm Account Type
                     </h1>
-                    <p className="text-slate-500 font-medium max-w-md mx-auto">
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-md mx-auto">
                         Please review and confirm your account type before proceeding to choose a plan.
                     </p>
                 </div>
