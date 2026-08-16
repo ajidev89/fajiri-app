@@ -25,14 +25,16 @@ export default function ChoosePlan() {
     const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
-    const isUpgrade = new URLSearchParams(location.search).get("upgrade") === "true";
+    const searchParams = new URLSearchParams(location.search);
+    const isUpgrade = searchParams.get("upgrade") === "true";
     const currentPlanId = user?.plan?.id;
-    const accountType = user?.account_type;
+    const accountType = searchParams.get("account_type") || user?.account_type;
+    const subAccountType = searchParams.get("sub_account_type") || user?.sub_account_type;
 
     useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const response = await authApi.getPlans(accountType);
+                const response = await authApi.getPlans(accountType, subAccountType);
                 // Ensure features is handled as an array
                 const formattedPlans = (response.data.data || []).map(
                     (p: any) => ({
@@ -49,7 +51,7 @@ export default function ChoosePlan() {
         };
 
         fetchPlans();
-    }, [accountType]);
+    }, [accountType, subAccountType]);
 
     const handleSubscribe = async () => {
         if (!selectedPlanId) return;
@@ -104,11 +106,11 @@ export default function ChoosePlan() {
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] block mb-2">
                         {isUpgrade ? "Account Management" : "Step 2 of 3"}
                     </span>
-                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight capitalize">
                         {isUpgrade ? "Upgrade your " : "Choose the "}
-                        {accountType ? (
+                        {subAccountType || accountType ? (
                             <span className="text-[#002B49]">
-                                {accountType}
+                                {(subAccountType || accountType)?.replace(/-/g, " ")}
                             </span>
                         ) : (
                             ""

@@ -2,15 +2,19 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Phone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logoImg from "@/assets/fajiri-logo.png";
 import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
+import { cn } from "@/lib/utils";
+
+type LoginMethod = "email" | "phone";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const { isAuthenticated, user } = useAuthStore();
+    const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -30,13 +34,21 @@ export default function LoginPage() {
     // Form State
     const [formData, setFormData] = useState({
         email: "",
+        phone: "",
         password: "",
     });
 
     useEffect(() => {
-        const rememberedEmail = localStorage.getItem("fajiri_remembered_email");
-        if (rememberedEmail) {
-            setFormData((prev) => ({ ...prev, email: rememberedEmail }));
+        const rememberedMethod = (localStorage.getItem("fajiri_remembered_method") as LoginMethod) || "email";
+        const rememberedIdentifier = localStorage.getItem("fajiri_remembered_identifier") || localStorage.getItem("fajiri_remembered_email");
+
+        if (rememberedIdentifier) {
+            setLoginMethod(rememberedMethod);
+            if (rememberedMethod === "phone") {
+                setFormData((prev) => ({ ...prev, phone: rememberedIdentifier }));
+            } else {
+                setFormData((prev) => ({ ...prev, email: rememberedIdentifier }));
+            }
             setRememberMe(true);
         }
     }, []);
@@ -50,29 +62,36 @@ export default function LoginPage() {
         setError(null);
     };
 
+    const activeIdentifier = loginMethod === "email" ? formData.email : formData.phone;
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
         try {
-            const loginData = { email: formData.email, password: formData.password };
+            const loginPayload =
+                loginMethod === "email"
+                    ? { email: formData.email, password: formData.password }
+                    : { phone: formData.phone, password: formData.password };
 
-            await authApi.login(loginData);
+            await authApi.login(loginPayload);
 
             if (rememberMe) {
-                localStorage.setItem("fajiri_remembered_email", formData.email);
+                localStorage.setItem("fajiri_remembered_method", loginMethod);
+                localStorage.setItem("fajiri_remembered_identifier", activeIdentifier);
             } else {
+                localStorage.removeItem("fajiri_remembered_method");
+                localStorage.removeItem("fajiri_remembered_identifier");
                 localStorage.removeItem("fajiri_remembered_email");
             }
 
             setOtpSent(true);
-            // The backend returns "Successfully sent otp"
         } catch (err: any) {
-            console.log(err);
+            console.error("Login error:", err);
             setError(
                 err.response?.data?.message ||
-                    "Invalid login credentials. Please try again.",
+                    "Invalid login credentials. Please check your credentials and try again.",
             );
         } finally {
             setLoading(false);
@@ -86,8 +105,8 @@ export default function LoginPage() {
 
         try {
             await authApi.verifyOtp({
-                identifier: formData.email,
-                channel: "email",
+                identifier: activeIdentifier,
+                channel: loginMethod === "email" ? "email" : "phone",
                 code: otp,
             });
 
@@ -126,14 +145,14 @@ export default function LoginPage() {
 
             {/* Login Card */}
             <div className="w-full max-w-[480px] bg-white rounded-2xl shadow-sm border border-slate-100 p-8 md:p-12 transition-all">
-                <div className="text-center mb-10">
+                <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-slate-900 mb-2">
                         {otpSent ? "Verify OTP" : "Welcome Back"}
                     </h1>
-                    <p className="text-slate-500">
+                    <p className="text-slate-500 text-sm">
                         {otpSent
-                            ? `We've sent a verification code to ${formData.email}`
-                            : "Glad to see you again. Login to your family member account"}
+                            ? `We've sent a verification code to ${activeIdentifier}`
+                            : "Glad to see you again. Login to your account"}
                     </p>
                 </div>
 
@@ -144,26 +163,82 @@ export default function LoginPage() {
                 )}
 
                 {!otpSent ? (
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="email"
-                                className="text-slate-700 font-medium"
+                    <form onSubmit={handleLogin} className="space-y-5">
+                        {/* Login Method Segmented Switcher */}
+                        <div className="flex bg-slate-100/80 p-1 rounded-xl border border-slate-200/60">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setLoginMethod("email");
+                                    setError(null);
+                                }}
+                                className={cn(
+                                    "flex-1 py-2 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer",
+                                    loginMethod === "email"
+                                        ? "bg-white text-[#002B49] shadow-xs"
+                                        : "text-slate-500 hover:text-slate-900"
+                                )}
                             >
-                                Email Address
-                            </Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                placeholder="Enter email address"
-                                className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
-                            />
+                                <Mail className="w-4 h-4" />
+                                Email
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setLoginMethod("phone");
+                                    setError(null);
+                                }}
+                                className={cn(
+                                    "flex-1 py-2 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer",
+                                    loginMethod === "phone"
+                                        ? "bg-white text-[#002B49] shadow-xs"
+                                        : "text-slate-500 hover:text-slate-900"
+                                )}
+                            >
+                                <Phone className="w-4 h-4" />
+                                Phone Number
+                            </button>
                         </div>
 
-                        <div className="space-y-2 relative">
+                        {loginMethod === "email" ? (
+                            <div className="space-y-1.5">
+                                <Label
+                                    htmlFor="email"
+                                    className="text-slate-700 font-medium"
+                                >
+                                    Email Address
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. name@example.com"
+                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors rounded-xl"
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-1.5">
+                                <Label
+                                    htmlFor="phone"
+                                    className="text-slate-700 font-medium"
+                                >
+                                    Phone Number
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. +2348000000000"
+                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors rounded-xl"
+                                />
+                            </div>
+                        )}
+
+                        <div className="space-y-1.5 relative">
                             <div className="flex justify-between items-center">
                                 <Label
                                     htmlFor="password"
@@ -180,7 +255,7 @@ export default function LoginPage() {
                                     value={formData.password}
                                     onChange={handleInputChange}
                                     placeholder="Enter password"
-                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors pr-12"
+                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors pr-12 rounded-xl"
                                 />
                                 <button
                                     type="button"
@@ -198,7 +273,7 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center pt-1">
                             <div className="flex items-center gap-2">
                                 <input
                                     id="remember_me"
@@ -225,7 +300,7 @@ export default function LoginPage() {
                         <Button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-12 bg-[#002B49] hover:bg-[#001F35] text-white font-semibold text-base transition-all"
+                            className="w-full h-12 bg-[#002B49] hover:bg-[#001F35] text-white font-semibold text-base transition-all rounded-xl shadow-sm cursor-pointer"
                         >
                             {loading ? (
                                 <Loader2 className="animate-spin mr-2" />
@@ -234,7 +309,7 @@ export default function LoginPage() {
                             )}
                         </Button>
 
-                        <div className="text-center text-sm text-slate-600">
+                        <div className="text-center text-sm text-slate-600 pt-2">
                             Don't have an account?{" "}
                             <Link
                                 to="/signup"
@@ -243,8 +318,6 @@ export default function LoginPage() {
                                 Sign Up
                             </Link>
                         </div>
-
-
                     </form>
                 ) : (
                     <form onSubmit={handleVerifyOtp} className="space-y-6">
@@ -262,7 +335,7 @@ export default function LoginPage() {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 placeholder="Enter 6-digit code"
-                                className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors text-center text-2xl tracking-[0.5em] font-bold"
+                                className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-colors text-center text-2xl tracking-[0.5em] font-bold rounded-xl"
                                 maxLength={6}
                             />
                         </div>
@@ -270,7 +343,7 @@ export default function LoginPage() {
                         <Button
                             type="submit"
                             disabled={loading || otp.length < 6}
-                            className="w-full h-12 bg-[#002B49] hover:bg-[#001F35] text-white font-semibold text-base transition-all"
+                            className="w-full h-12 bg-[#002B49] hover:bg-[#001F35] text-white font-semibold text-base transition-all rounded-xl shadow-sm cursor-pointer"
                         >
                             {loading ? (
                                 <Loader2 className="animate-spin mr-2" />
@@ -283,7 +356,7 @@ export default function LoginPage() {
                             <button
                                 type="button"
                                 onClick={() => setOtpSent(false)}
-                                className="text-sm font-semibold text-[#002B49] hover:underline"
+                                className="text-sm font-semibold text-[#002B49] hover:underline cursor-pointer"
                             >
                                 Back to Login
                             </button>

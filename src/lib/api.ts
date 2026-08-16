@@ -39,6 +39,9 @@ export const authApi = {
         if (loginData.email) {
             loginData.email = loginData.email.trim().toLowerCase();
         }
+        if (loginData.phone) {
+            loginData.phone = loginData.phone.trim();
+        }
         const response = await api.post("/auth/login", loginData);
         const user = response.data.data || {};
         if (user) {
@@ -55,6 +58,8 @@ export const authApi = {
         const verifyData = { ...data };
         if (verifyData.channel === "email") {
             verifyData.identifier = verifyData.identifier.trim().toLowerCase();
+        } else {
+            verifyData.identifier = verifyData.identifier.trim();
         }
         const response = await api.post("/auth/generate-token", verifyData);
         const { token } = response.data.data;
@@ -71,9 +76,13 @@ export const authApi = {
         return response;
     },
 
-    getPlans: async (accountType?: string) => {
+    getPlans: async (accountType?: string, subAccountType?: string | null) => {
+        const params: Record<string, any> = {};
+        if (accountType) params.account_type = accountType;
+        if (subAccountType) params.sub_account_type = subAccountType;
+
         const response = await api.get("/plans", {
-            params: { account_type: accountType },
+            params,
         });
         return response;
     },
@@ -138,10 +147,18 @@ export const authApi = {
 
     initializeSubscription: async (data: {
         plan_id: string;
+        gateway?: string;
+        payment_method?: string;
+        currency?: string;
         success_url?: string;
         cancel_url?: string;
     }) => {
-        const response = await api.post("/plans/initialize-subscription", data);
+        const payload = {
+            gateway: "paystack",
+            payment_method: "paystack",
+            ...data,
+        };
+        const response = await api.post("/plans/initialize-subscription", payload);
         return response;
     },
 

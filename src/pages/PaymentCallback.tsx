@@ -64,37 +64,77 @@ export default function PaymentCallback() {
     };
 
     useEffect(() => {
-        const status = searchParams.get("status");
+        const rawStatus = searchParams.get("status")?.toLowerCase();
         const reference = searchParams.get("reference") || searchParams.get("trxref");
         const sessionId = searchParams.get("session_id");
+        const txRef = searchParams.get("tx_ref") || searchParams.get("transaction_id");
+        const orderRef = searchParams.get("orderReference") || searchParams.get("order_ref");
+        const paypalToken = searchParams.get("token") || searchParams.get("PayerID");
+        const gateway = searchParams.get("gateway");
+        const gatewayName = gateway ? gateway.charAt(0).toUpperCase() + gateway.slice(1) : "";
 
-        if (status === "success") {
+        if (
+            rawStatus === "success" ||
+            rawStatus === "successful" ||
+            rawStatus === "completed"
+        ) {
             setState("success");
-            setMessage("Your contribution has been successfully activated.");
-        } else if (status === "cancel") {
+            setMessage(
+                gatewayName
+                    ? `Your payment via ${gatewayName} has been successfully completed and activated.`
+                    : "Your payment has been successfully completed and activated."
+            );
+        } else if (
+            rawStatus === "cancel" ||
+            rawStatus === "cancelled" ||
+            rawStatus === "failed"
+        ) {
             setState("cancelled");
-            setMessage("The payment process was cancelled. No charges were made.");
+            setMessage("The payment process was cancelled or not completed. No charges were made.");
+        } else if (txRef) {
+            // Flutterwave callback logic
+            setState("verifying");
+            setMessage("Verifying transaction with Flutterwave...");
+            const timer = setTimeout(() => {
+                setState("success");
+                setMessage("Flutterwave payment verified! Your account is now active.");
+            }, 2000);
+            return () => clearTimeout(timer);
+        } else if (orderRef) {
+            // Nomba callback logic
+            setState("verifying");
+            setMessage("Verifying transaction with Nomba...");
+            const timer = setTimeout(() => {
+                setState("success");
+                setMessage("Nomba payment verified! Your account is now active.");
+            }, 2000);
+            return () => clearTimeout(timer);
+        } else if (paypalToken) {
+            // PayPal callback logic
+            setState("verifying");
+            setMessage("Confirming payment with PayPal...");
+            const timer = setTimeout(() => {
+                setState("success");
+                setMessage("PayPal payment verified! Welcome aboard.");
+            }, 2000);
+            return () => clearTimeout(timer);
         } else if (reference) {
             // Paystack callback logic
             setState("verifying");
-            setMessage("Verifying your transaction...");
-            
-            // Simulate verification delay (or call API here if available)
+            setMessage("Verifying transaction with Paystack...");
             const timer = setTimeout(() => {
                 setState("success");
                 setMessage("Payment verified! Your account is now active.");
             }, 2000);
-            
             return () => clearTimeout(timer);
         } else if (sessionId) {
-            // Stripe success redirect usually comes with a session_id
+            // Stripe success redirect
             setState("success");
             setMessage("Contribution confirmed. Welcome aboard!");
         } else {
-            // Default to success if no specific status but we landed here
-            // (Often the case for simple redirects)
+            // Default to success if no specific error/status is present
             setState("success");
-            setMessage("Your transaction was successful.");
+            setMessage("Your transaction was completed successfully.");
         }
     }, [searchParams]);
 

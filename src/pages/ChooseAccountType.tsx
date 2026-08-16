@@ -6,24 +6,30 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import AuthHeader from "@/components/auth/layout/header/AuthHeader";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
+import AccountTypeSelector from "@/components/auth/AccountTypeSelector";
 
 export default function ChooseAccountType() {
     const navigate = useNavigate();
     const { user } = useAuthStore();
     const [loading, setLoading] = useState(false);
     const [accountType, setAccountType] = useState(user?.account_type || "identified-membership");
-    const [subAccountType, setSubAccountType] = useState(user?.sub_account_type || "");
+    const [subAccountType, setSubAccountType] = useState(user?.sub_account_type || (user?.account_type === "corporate-membership" ? "global-collaborators" : ""));
 
     const handleContinue = async () => {
         setLoading(true);
         try {
+            const finalSubAccountType = accountType === "corporate-membership" ? (subAccountType || "global-collaborators") : null;
             await authApi.updateProfile({
                 account_type: accountType,
-                sub_account_type: accountType === "corporate-membership" ? subAccountType : null,
+                sub_account_type: finalSubAccountType,
             });
             toast.success("Account type confirmed");
-            navigate("/choose-plan");
+
+            const params = new URLSearchParams();
+            if (accountType) params.set("account_type", accountType);
+            if (finalSubAccountType) params.set("sub_account_type", finalSubAccountType);
+
+            navigate(`/choose-plan?${params.toString()}`);
         } catch (err) {
             console.error("Error updating account type:", err);
             toast.error("Failed to update account type");
@@ -38,8 +44,8 @@ export default function ChooseAccountType() {
                 <AuthHeader />
             </header>
 
-            <main className="container mx-auto px-6 pt-32 pb-24 text-center max-w-lg">
-                <div className="mb-12">
+            <main className="container mx-auto px-6 pt-32 pb-24 text-center max-w-xl">
+                <div className="mb-10">
                     <div className="flex items-center justify-center gap-2 mb-4">
                         <div className="h-1.5 w-12 rounded-full bg-[#002B49]"></div>
                         <div className="h-1.5 w-8 rounded-full bg-slate-200"></div>
@@ -51,55 +57,31 @@ export default function ChooseAccountType() {
                     <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-4">
                         Confirm Account Type
                     </h1>
-                    <p className="text-slate-500 font-medium">
+                    <p className="text-slate-500 font-medium max-w-md mx-auto">
                         Please review and confirm your account type before proceeding to choose a plan.
                     </p>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-left space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="account_type" className="text-slate-700 font-bold">
-                            Account Type
-                        </Label>
-                        <select
-                            id="account_type"
-                            value={accountType}
-                            onChange={(e) => {
-                                setAccountType(e.target.value);
-                                if (e.target.value !== "corporate-membership") {
-                                    setSubAccountType("");
-                                }
-                            }}
-                            className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium"
-                        >
-                            <option value="identified-membership">Identified Membership</option>
-                            <option value="program-membership">Program Membership</option>
-                            <option value="corporate-membership">Corporate Membership</option>
-                        </select>
-                    </div>
-
-                    {accountType === "corporate-membership" && (
-                        <div className="space-y-2">
-                            <Label htmlFor="sub_account_type" className="text-slate-700 font-bold">
-                                Sub Account Type
-                            </Label>
-                            <select
-                                id="sub_account_type"
-                                value={subAccountType}
-                                onChange={(e) => setSubAccountType(e.target.value)}
-                                className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium"
-                            >
-                                <option value="" disabled>Select sub type</option>
-                                <option value="global-collaborators">Global Collaborators</option>
-                                <option value="global-sponsors">Global Sponsors</option>
-                            </select>
-                        </div>
-                    )}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8 text-left space-y-6">
+                    <AccountTypeSelector
+                        value={accountType}
+                        subValue={subAccountType}
+                        onChange={(val) => {
+                            setAccountType(val);
+                            if (val === "corporate-membership") {
+                                if (!subAccountType) setSubAccountType("global-collaborators");
+                            } else {
+                                setSubAccountType("");
+                            }
+                        }}
+                        onSubChange={(subVal) => setSubAccountType(subVal)}
+                        disabled={loading}
+                    />
 
                     <Button
                         onClick={handleContinue}
                         disabled={loading || (accountType === "corporate-membership" && !subAccountType)}
-                        className="w-full h-14 bg-[#002B49] hover:bg-[#001F35] text-white font-bold text-lg rounded-xl transition-all mt-4"
+                        className="w-full h-14 bg-[#002B49] hover:bg-[#001F35] text-white font-bold text-lg rounded-xl transition-all shadow-md shadow-[#002B49]/10 mt-4 cursor-pointer"
                     >
                         {loading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : "Continue"}
                     </Button>

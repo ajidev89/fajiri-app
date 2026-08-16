@@ -5,6 +5,7 @@ interface User {
     id: string;
     email: string;
     account_type: string;
+    sub_account_type?: string | null;
     [key: string]: any;
 }
 

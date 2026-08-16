@@ -45,6 +45,7 @@ export default function RegisterPage() {
     const [formData, setFormData] = useState({
         first_name: "",
         last_name: "",
+        gender: "",
         account_type: "identified-membership", // identified-membership|program-membership|corporate-membership
         sub_account_type: "" as string | null, // null|global-collaborators|global-sponsors
         country_id: "",
@@ -448,56 +449,7 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <Label
-                                    htmlFor="account_type"
-                                    className="text-slate-700 font-medium"
-                                >
-                                    Account Type
-                                </Label>
-                                <select
-                                    id="account_type"
-                                    required
-                                    value={formData.account_type}
-                                    onChange={handleInputChange}
-                                    className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium text-sm"
-                                >
-                                    <option value="identified-membership">
-                                        Identified Membership
-                                    </option>
-                                    <option value="program-membership">
-                                        Program Membership
-                                    </option>
-                                    <option value="corporate-membership">
-                                        Corporate Membership
-                                    </option>
-                                </select>
-                            </div>
 
-                            {formData.account_type ===
-                                "corporate-membership" && (
-                                <div className="space-y-1.5">
-                                    <Label
-                                        htmlFor="sub_account_type"
-                                        className="text-slate-700 font-medium"
-                                    >
-                                        Sub Account Type
-                                    </Label>
-                                    <select
-                                        id="sub_account_type"
-                                        value={formData.sub_account_type || ""}
-                                        onChange={handleInputChange}
-                                        className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium text-sm"
-                                    >
-                                        <option value="global-collaborators">
-                                            Global Collaborators
-                                        </option>
-                                        <option value="global-sponsors">
-                                            Global Sponsors
-                                        </option>
-                                    </select>
-                                </div>
-                            )}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
@@ -526,6 +478,31 @@ export default function RegisterPage() {
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label
+                                        htmlFor="gender"
+                                        className="text-slate-700 font-medium"
+                                    >
+                                        Gender
+                                    </Label>
+                                    <select
+                                        id="gender"
+                                        required
+                                        value={formData.gender}
+                                        onChange={handleInputChange}
+                                        className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium text-sm"
+                                    >
+                                        <option value="" disabled>
+                                            Select gender
+                                        </option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <Label
                                         htmlFor="dob"
                                         className="text-slate-700 font-medium"
                                     >
@@ -540,24 +517,23 @@ export default function RegisterPage() {
                                         className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
                                     />
                                 </div>
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <Label
-                                    htmlFor="phone"
-                                    className="text-slate-700 font-medium"
-                                >
-                                    Phone Number
-                                </Label>
-                                <Input
-                                    id="phone"
-                                    type="tel"
-                                    required
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    placeholder="e.g. +2348000000000"
-                                    className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
-                                />
+                                <div className="space-y-1.5">
+                                    <Label
+                                        htmlFor="phone"
+                                        className="text-slate-700 font-medium"
+                                    >
+                                        Phone Number
+                                    </Label>
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        required
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. +2348000000000"
+                                        className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-1.5">
