@@ -64,7 +64,11 @@ export default function PaymentCallback() {
     };
 
     useEffect(() => {
-        const rawStatus = searchParams.get("status")?.toLowerCase();
+        const statuses = searchParams.getAll("status").map(s => s.toLowerCase());
+        const rawStatus = statuses[statuses.length - 1]; // Fallback to last status just in case
+        const hasCancelled = statuses.some(s => ["cancel", "cancelled", "failed"].includes(s));
+        const hasSuccess = statuses.some(s => ["success", "successful", "completed"].includes(s));
+
         const reference = searchParams.get("reference") || searchParams.get("trxref");
         const sessionId = searchParams.get("session_id");
         const txRef = searchParams.get("tx_ref") || searchParams.get("transaction_id");
@@ -73,24 +77,16 @@ export default function PaymentCallback() {
         const gateway = searchParams.get("gateway");
         const gatewayName = gateway ? gateway.charAt(0).toUpperCase() + gateway.slice(1) : "";
 
-        if (
-            rawStatus === "success" ||
-            rawStatus === "successful" ||
-            rawStatus === "completed"
-        ) {
+        if (hasCancelled) {
+            setState("cancelled");
+            setMessage("The payment process was cancelled or not completed. No charges were made.");
+        } else if (hasSuccess) {
             setState("success");
             setMessage(
                 gatewayName
                     ? `Your payment via ${gatewayName} has been successfully completed and activated.`
                     : "Your payment has been successfully completed and activated."
             );
-        } else if (
-            rawStatus === "cancel" ||
-            rawStatus === "cancelled" ||
-            rawStatus === "failed"
-        ) {
-            setState("cancelled");
-            setMessage("The payment process was cancelled or not completed. No charges were made.");
         } else if (txRef) {
             // Flutterwave callback logic
             setState("verifying");

@@ -170,7 +170,7 @@ export default function PaymentMethod() {
                 plan_id: selectedPlanId,
                 gateway: gatewayId,
                 payment_method: gatewayId,
-                success_url: `${window.location.origin}/payment/callback?status=success&gateway=${gatewayId}`,
+                success_url: `${window.location.origin}/payment/callback?${['stripe', 'paypal'].includes(gatewayId) ? 'status=success&' : ''}gateway=${gatewayId}`,
                 cancel_url: `${window.location.origin}/payment/callback?status=cancel&gateway=${gatewayId}`,
             });
 
