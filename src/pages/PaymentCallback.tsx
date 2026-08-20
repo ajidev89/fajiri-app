@@ -65,7 +65,6 @@ export default function PaymentCallback() {
 
     useEffect(() => {
         const statuses = searchParams.getAll("status").map(s => s.toLowerCase());
-        const rawStatus = statuses[statuses.length - 1]; // Fallback to last status just in case
         const hasCancelled = statuses.some(s => ["cancel", "cancelled", "failed"].includes(s));
         const hasSuccess = statuses.some(s => ["success", "successful", "completed"].includes(s));
 
