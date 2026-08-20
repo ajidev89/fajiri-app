@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import Visa from "@/assets/visa.png";
 import Mastercard from "@/assets/mastercard.png";
 import Verve from "@/assets/verve.png";
+import flutterwaveLogo from "@/assets/flutterwave.png";
+import stripe from "@/assets/stripe.webp";
 import AuthHeader from "@/components/auth/layout/header/AuthHeader";
 
 interface PaymentGatewayOption {
@@ -20,7 +22,7 @@ interface PaymentGatewayOption {
 function PaystackLogo() {
     return (
         <div className="flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-all">
-            <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="2" y="3" width="20" height="3" rx="1.5" fill="#00C3F7" />
                 <rect x="2" y="8.5" width="15" height="3" rx="1.5" fill="#00C3F7" />
                 <rect x="2" y="14" width="20" height="3" rx="1.5" fill="#00C3F7" />
@@ -33,30 +35,13 @@ function PaystackLogo() {
 
 function StripeLogo() {
     return (
-        <div className="flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-all">
-            <svg className="h-4.5 w-auto" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M59.64 14.28c0-4.47-2.18-8.02-6.38-8.02-4.22 0-6.78 3.55-6.78 8 0 5.29 3.03 7.94 7.37 7.94 2.12 0 3.73-.48 4.93-1.16v-3.41c-1.2.6-2.58.94-4.2.94-1.68 0-3.14-.62-3.37-2.31h8.34c.03-.3.09-1.29.09-1.98zm-8.4-1.6c0-1.57.96-2.22 2.07-2.22 1.07 0 1.99.65 1.99 2.22h-4.06zm-7.6 9.32h4.63V.5h-4.63v21.5zm-5.46-13.62c-1.1-.47-2.37-.8-3.37-.8-2.29 0-3.79 1.18-3.79 3.19 0 3.11 4.28 2.62 4.28 3.96 0 .54-.47.74-1.14.74-1.48 0-3.37-.62-4.88-1.46v3.74c1.62.7 3.39 1.01 4.88 1.01 2.37 0 4.02-1.16 4.02-3.23 0-3.35-4.29-2.77-4.29-4.02 0-.44.38-.67 1-.67 1.25 0 2.82.47 4.29 1.22v-3.68zm-11.45.62l-.32-1.64h-3.99v16.32h4.62v-11.2c1.08 1.39 2.53 1.98 4.14 1.98.54 0 .97-.05 1.3-.17v-4.14c-.39.11-.84.14-1.39.14-1.87 0-3.4-1.04-4.36-2.29zm-13.9 1.02h-4.48v-4.04h4.48V2.86l4.63-1.25v4.37h4.09v4.04h-4.09v8.32c0 1.31.62 1.83 1.83 1.83.74 0 1.48-.12 1.94-.33v3.79c-.77.34-1.89.54-3.29.54-3.23 0-5.11-1.68-5.11-4.99v-9.16zM4.63 22H0V6.68h4.63V22zm0-18.06c0 1.28-1.04 2.32-2.32 2.32C1.04 6.26 0 5.22 0 3.94 0 2.66 1.04 1.62 2.32 1.62c1.28 0 2.32 1.04 2.32 2.32z"
-                    fill="#635BFF"
-                />
-            </svg>
-        </div>
-    );
+        <img src={stripe} className="h-4" />);
 }
 
 function FlutterwaveLogo() {
+
     return (
-        <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-all">
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 14C4 9.58 7.58 6 12 6C15.31 6 18.15 8.01 19.35 10.88C18.2 10.32 16.89 10 15.5 10C11.36 10 8 13.36 8 17.5C8 17.67 8.01 17.84 8.02 18H5.8C4.7 17.06 4 15.63 4 14Z" fill="#F5A623"/>
-                <path d="M7 16C7.2 12.2 10.3 9.2 14.2 9.2C16.8 9.2 19.1 10.5 20.5 12.5C19.4 13.2 18 13.8 16.5 13.8C13.2 13.8 10.5 16.5 10.5 19.8C10.5 20.2 10.54 20.6 10.62 21H8.5C7.5 20.06 7 18.2 7 16Z" fill="#FF5964"/>
-                <path d="M10 18C10.5 15.2 13 13 16 13C17.8 13 19.4 13.8 20.5 15C19.5 15.8 18.5 16.2 17.2 16.2C15 16.2 13.2 18 13.2 20.2C13.2 20.6 13.25 21 13.35 21.4H11.5C10.5 20.8 10 19.5 10 18Z" fill="#3B82F6"/>
-            </svg>
-            <span className="text-xs font-bold text-slate-800 tracking-tight">Flutterwave</span>
-        </div>
-    );
+        <img src={flutterwaveLogo} className="h-8" />);
 }
 
 // function NombaLogo() {
@@ -113,7 +98,7 @@ export default function PaymentMethod() {
                     <PaystackLogo />
                     <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-all">
                         <img src={Visa} alt="Visa" className="h-3 w-auto object-contain" />
-                        <img src={Mastercard} alt="Mastercard" className="h-4.5 w-auto object-contain" />
+                        <img src={Mastercard} alt="Mastercard" className="h-5 w-auto object-contain" />
                         <img src={Verve} alt="Verve" className="h-3 w-auto object-contain" />
                     </div>
                 </div>
@@ -129,7 +114,7 @@ export default function PaymentMethod() {
                     <StripeLogo />
                     <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-all">
                         <img src={Visa} alt="Visa" className="h-3 w-auto object-contain" />
-                        <img src={Mastercard} alt="Mastercard" className="h-4.5 w-auto object-contain" />
+                        <img src={Mastercard} alt="Mastercard" className="h-5 w-auto object-contain" />
                     </div>
                 </div>
             ),
@@ -254,13 +239,12 @@ export default function PaymentMethod() {
                             <div
                                 key={gateway.id}
                                 onClick={() => !loadingGateway && handleSelectPayment(gateway.id)}
-                                className={`group relative w-full bg-white border-2 rounded-2xl p-4 sm:p-5 md:p-6 flex items-center justify-between transition-all duration-200 ${
-                                    isLoading
-                                        ? "border-[#002B49] bg-slate-50/50 shadow-md ring-2 ring-[#002B49]/10"
-                                        : isDisabled
+                                className={`group relative w-full bg-white border-2 rounded-2xl p-4 sm:p-5 md:p-6 flex items-center justify-between transition-all duration-200 ${isLoading
+                                    ? "border-[#002B49] bg-slate-50/50 shadow-md ring-2 ring-[#002B49]/10"
+                                    : isDisabled
                                         ? "opacity-50 border-slate-100 cursor-not-allowed"
                                         : "border-slate-100 hover:border-[#002B49] hover:shadow-lg cursor-pointer md:hover:-translate-y-0.5"
-                                }`}
+                                    }`}
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 flex-1 min-w-0 mr-3">
                                     <div className="space-y-1 min-w-0">
