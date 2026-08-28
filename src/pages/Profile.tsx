@@ -95,10 +95,17 @@ function InformationTab({ user }: { user: any }) {
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return "-";
-        return new Date(dateString).toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
+    
+        const [year, month, day] = dateString.split("-");
+    
+        return new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day)
+        ).toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
         });
     };
 
