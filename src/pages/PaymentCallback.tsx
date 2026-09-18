@@ -71,7 +71,11 @@ export default function PaymentCallback() {
         const reference = searchParams.get("reference") || searchParams.get("trxref");
         const sessionId = searchParams.get("session_id");
         const txRef = searchParams.get("tx_ref") || searchParams.get("transaction_id");
-        const orderRef = searchParams.get("orderReference") || searchParams.get("order_ref");
+        const orderRef =
+            searchParams.get("orderReference") ||
+            searchParams.get("order_ref") ||
+            searchParams.get("orderId") ||
+            searchParams.get("order_id");
         const paypalToken = searchParams.get("token") || searchParams.get("PayerID");
         const gateway = searchParams.get("gateway");
         const gatewayName = gateway ? gateway.charAt(0).toUpperCase() + gateway.slice(1) : "";

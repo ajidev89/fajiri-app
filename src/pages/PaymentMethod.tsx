@@ -44,20 +44,20 @@ function FlutterwaveLogo() {
         <img src={flutterwaveLogo} className="h-8" />);
 }
 
-// function NombaLogo() {
-//     return (
-//         <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-all">
-//             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                 <rect width="24" height="24" rx="5" fill="#FFB703" />
-//                 <path
-//                     d="M7 16.5V7.5H9.5L14.5 13.5V7.5H17V16.5H14.5L9.5 10.5V16.5H7Z"
-//                     fill="#023047"
-//                 />
-//             </svg>
-//             <span className="text-xs font-black tracking-tight text-slate-800">nomba</span>
-//         </div>
-//     );
-// }
+function NombaLogo() {
+    return (
+        <div className="flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-all">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="5" fill="#FFB703" />
+                <path
+                    d="M7 16.5V7.5H9.5L14.5 13.5V7.5H17V16.5H14.5L9.5 10.5V16.5H7Z"
+                    fill="#023047"
+                />
+            </svg>
+            <span className="text-xs font-black tracking-tight text-slate-800">nomba</span>
+        </div>
+    );
+}
 
 function PayPalLogo() {
     return (
@@ -126,12 +126,22 @@ export default function PaymentMethod() {
             badge: "Popular",
             renderLogos: () => <FlutterwaveLogo />,
         },
-        // {
-        //     id: "nomba",
-        //     name: "Nomba",
-        //     description: "Quick checkout via Card, Bank Transfer, or QR payment",
-        //     renderLogos: () => <NombaLogo />,
-        // },
+        {
+            id: "nomba",
+            name: "Nomba",
+            description: "Quick checkout via Card, Bank Transfer, or QR payment",
+            badge: "NGN",
+            renderLogos: () => (
+                <div className="flex items-center gap-2">
+                    <NombaLogo />
+                    <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-all">
+                        <img src={Visa} alt="Visa" className="h-3 w-auto object-contain" />
+                        <img src={Mastercard} alt="Mastercard" className="h-5 w-auto object-contain" />
+                        <img src={Verve} alt="Verve" className="h-3 w-auto object-contain" />
+                    </div>
+                </div>
+            ),
+        },
         {
             id: "paypal",
             name: "PayPal",
@@ -163,11 +173,14 @@ export default function PaymentMethod() {
             const redirectUrl =
                 data.authorization_url ||
                 data.checkout_url ||
+                data.checkoutLink ||
+                data.checkout_link ||
                 data.url ||
                 data.link ||
                 data.payment_url ||
                 response.data?.url ||
-                response.data?.authorization_url;
+                response.data?.authorization_url ||
+                response.data?.checkoutLink;
 
             if (redirectUrl) {
                 window.location.href = redirectUrl;
