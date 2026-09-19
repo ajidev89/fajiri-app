@@ -254,7 +254,7 @@ function InformationTab({ user }: { user: any }) {
                             <Button 
                                 variant="outline" 
                                 size="icon" 
-                                onClick={() => handleCopy(`https://app.fajiri.com/register?ref=${user.referral_code}`)}
+                                onClick={() => handleCopy(`https://app.fajiri.org/register?ref=${user.referral_code}`)}
                                 className="shrink-0"
                             >
                                 <Copy className="h-4 w-4" />
