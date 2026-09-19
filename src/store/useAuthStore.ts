@@ -57,6 +57,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         storage.remove("fajiri_token");
         storage.remove("login_response");
         storage.remove("selected_plan_id");
+        storage.remove("is_upgrading");
         set({ user: null, token: null, isAuthenticated: false });
     },
 

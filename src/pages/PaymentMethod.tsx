@@ -82,9 +82,10 @@ function PayPalLogo() {
 export default function PaymentMethod() {
     const navigate = useNavigate();
     const [loadingGateway, setLoadingGateway] = useState<string | null>(null);
+    const isUpgrade = storage.get("is_upgrading") === true;
 
     const handleBack = () => {
-        navigate("/choose-plan");
+        navigate(isUpgrade ? "/choose-plan?upgrade=true" : "/choose-plan");
     };
 
     const paymentGateways: PaymentGatewayOption[] = [

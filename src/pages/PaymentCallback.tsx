@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, XCircle, Loader2, AlertCircle, RefreshCcw, Home } from "lucide-react";
 import AuthHeader from "@/components/auth/layout/header/AuthHeader";
+import { storage } from "@/lib/storage";
+import { authApi } from "@/lib/api";
 
 type PaymentState = "verifying" | "success" | "cancelled" | "error";
 
@@ -57,9 +59,11 @@ export default function PaymentCallback() {
 
         // 6. Fallback for non-webview: navigate
         if (state === "success") {
-            navigate("/profile");
+            storage.remove("is_upgrading");
+            navigate("/profile?tab=billing");
         } else {
-            navigate("/payment-method");
+            const upgradeQuery = storage.get("is_upgrading") === true ? "?upgrade=true" : "";
+            navigate(`/payment-method${upgradeQuery}`);
         }
     };
 
@@ -80,12 +84,18 @@ export default function PaymentCallback() {
         const gateway = searchParams.get("gateway");
         const gatewayName = gateway ? gateway.charAt(0).toUpperCase() + gateway.slice(1) : "";
 
+        const markSuccess = (nextMessage: string) => {
+            storage.remove("is_upgrading");
+            authApi.getCurrentUser().catch(() => {});
+            setState("success");
+            setMessage(nextMessage);
+        };
+
         if (hasCancelled) {
             setState("cancelled");
             setMessage("The payment process was cancelled or not completed. No charges were made.");
         } else if (hasSuccess) {
-            setState("success");
-            setMessage(
+            markSuccess(
                 gatewayName
                     ? `Your payment via ${gatewayName} has been successfully completed and activated.`
                     : "Your payment has been successfully completed and activated."
@@ -95,8 +105,7 @@ export default function PaymentCallback() {
             setState("verifying");
             setMessage("Verifying transaction with Flutterwave...");
             const timer = setTimeout(() => {
-                setState("success");
-                setMessage("Flutterwave payment verified! Your account is now active.");
+                markSuccess("Flutterwave payment verified! Your account is now active.");
             }, 2000);
             return () => clearTimeout(timer);
         } else if (orderRef) {
@@ -104,8 +113,7 @@ export default function PaymentCallback() {
             setState("verifying");
             setMessage("Verifying transaction with Nomba...");
             const timer = setTimeout(() => {
-                setState("success");
-                setMessage("Nomba payment verified! Your account is now active.");
+                markSuccess("Nomba payment verified! Your account is now active.");
             }, 2000);
             return () => clearTimeout(timer);
         } else if (paypalToken) {
@@ -113,8 +121,7 @@ export default function PaymentCallback() {
             setState("verifying");
             setMessage("Confirming payment with PayPal...");
             const timer = setTimeout(() => {
-                setState("success");
-                setMessage("PayPal payment verified! Welcome aboard.");
+                markSuccess("PayPal payment verified! Welcome aboard.");
             }, 2000);
             return () => clearTimeout(timer);
         } else if (reference) {
@@ -122,18 +129,15 @@ export default function PaymentCallback() {
             setState("verifying");
             setMessage("Verifying transaction with Paystack...");
             const timer = setTimeout(() => {
-                setState("success");
-                setMessage("Payment verified! Your account is now active.");
+                markSuccess("Payment verified! Your account is now active.");
             }, 2000);
             return () => clearTimeout(timer);
         } else if (sessionId) {
             // Stripe success redirect
-            setState("success");
-            setMessage("Contribution confirmed. Welcome aboard!");
+            markSuccess("Contribution confirmed. Welcome aboard!");
         } else {
             // Default to success if no specific error/status is present
-            setState("success");
-            setMessage("Your transaction was completed successfully.");
+            markSuccess("Your transaction was completed successfully.");
         }
     }, [searchParams]);
 
@@ -214,7 +218,10 @@ export default function PaymentCallback() {
                             </button>
                             {!isWebview && (
                                 <button
-                                    onClick={() => navigate("/choose-plan")}
+                                    onClick={() => {
+                                        storage.set("is_upgrading", true);
+                                        navigate("/choose-plan?upgrade=true");
+                                    }}
                                     className="w-full h-14 bg-slate-50 text-slate-600 font-bold rounded-2xl hover:bg-slate-100 transition-all cursor-pointer"
                                 >
                                     Change Plan

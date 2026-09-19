@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import AuthHeader from "@/components/auth/layout/header/AuthHeader";
 import { Button } from "@/components/ui/button";
@@ -23,10 +23,22 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { authApi } from "@/lib/api";
+import { storage } from "@/lib/storage";
+
+function startPlanUpgrade(navigate: ReturnType<typeof useNavigate>) {
+    storage.set("is_upgrading", true);
+    navigate("/choose-plan?upgrade=true");
+}
 
 export default function Profile() {
     const { user } = useAuthStore();
-    const [activeTab, setActiveTab] = useState("information");
+    const [searchParams] = useSearchParams();
+    const initialTab = searchParams.get("tab");
+    const [activeTab, setActiveTab] = useState(
+        initialTab === "billing" || initialTab === "history"
+            ? initialTab
+            : "information",
+    );
 
     const tabs = [
         { id: "information", label: "Information", icon: User },
@@ -88,6 +100,7 @@ export default function Profile() {
 }
 
 function InformationTab({ user }: { user: any }) {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [firstName, setFirstName] = useState(user?.profile?.first_name || "");
     const [lastName, setLastName] = useState(user?.profile?.last_name || "");
@@ -236,7 +249,19 @@ function InformationTab({ user }: { user: any }) {
                     </div>
                     <div>
                         <p className="text-sm text-slate-500 font-medium">Active Plan</p>
-                        <p className="font-semibold text-slate-900">{user?.plan?.name || "-"}</p>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <p className="font-semibold text-slate-900">{user?.plan?.name || "-"}</p>
+                            {user?.plan && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => startPlanUpgrade(navigate)}
+                                    className="h-8 border-slate-200 text-[#002B49] font-bold rounded-lg px-3"
+                                >
+                                    Upgrade Plan
+                                </Button>
+                            )}
+                        </div>
                     </div>
                     <div>
                         <p className="text-sm text-slate-500 font-medium">Expiry Plan Date</p>
@@ -249,7 +274,7 @@ function InformationTab({ user }: { user: any }) {
                         <p className="text-sm text-slate-500 font-medium mb-1">Referral Link</p>
                         <div className="flex items-center gap-2 max-w-full">
                             <div className="bg-slate-50 px-3 py-2 rounded-lg text-sm text-slate-900 font-medium truncate flex-1 border border-slate-100">
-                                https://app.fajiri.com/register?ref={user.referral_code}
+                                https://app.fajiri.org/register?ref={user.referral_code}
                             </div>
                             <Button 
                                 variant="outline" 
@@ -303,11 +328,11 @@ function BillingTab({ user }: { user: any }) {
                             </div>
                         </div>
                         <Button
-                            onClick={() => navigate("/choose-plan?upgrade=true")}
+                            onClick={() => startPlanUpgrade(navigate)}
                             variant="outline"
                             className="h-12 border-slate-200 text-[#002B49] font-bold rounded-xl px-6 hover:bg-slate-100"
                         >
-                            Change Plan
+                            Upgrade Plan
                         </Button>
                     </div>
                 ) : (

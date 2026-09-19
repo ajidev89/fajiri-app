@@ -26,10 +26,28 @@ export default function ChoosePlan() {
     const [submitting, setSubmitting] = useState(false);
 
     const searchParams = new URLSearchParams(location.search);
-    const isUpgrade = searchParams.get("upgrade") === "true";
-    const currentPlanId = user?.plan?.id;
+    const isUpgrade =
+        searchParams.get("upgrade") === "true" ||
+        storage.get("is_upgrading") === true;
+    const currentPlanId = user?.plan?.id ?? user?.plan_id;
+    const currentPlanName = user?.plan?.name;
+    const currentPlanPrice = Number(user?.plan?.price ?? 0);
     const accountType = searchParams.get("account_type") || user?.account_type;
     const subAccountType = searchParams.get("sub_account_type") || user?.sub_account_type;
+
+    const isSamePlan = (plan: Plan) => {
+        if (!isUpgrade) return false;
+        if (currentPlanId != null && String(plan.id) === String(currentPlanId)) {
+            return true;
+        }
+        return Boolean(currentPlanName && plan.name === currentPlanName);
+    };
+
+    useEffect(() => {
+        if (isUpgrade) {
+            storage.set("is_upgrading", true);
+        }
+    }, [isUpgrade]);
 
     useEffect(() => {
         const fetchPlans = async () => {
@@ -53,14 +71,27 @@ export default function ChoosePlan() {
         fetchPlans();
     }, [accountType, subAccountType]);
 
+    const handleBack = () => {
+        if (isUpgrade) {
+            storage.remove("is_upgrading");
+            navigate("/profile?tab=billing");
+            return;
+        }
+        navigate("/choose-account-type");
+    };
+
     const handleSubscribe = async () => {
         if (!selectedPlanId) return;
 
         setSubmitting(true);
         try {
-            // Store selected plan in storage temporarily or pass via state
             storage.set("selected_plan_id", selectedPlanId);
-            navigate("/payment-method");
+            if (isUpgrade) {
+                storage.set("is_upgrading", true);
+                navigate("/payment-method?upgrade=true");
+            } else {
+                navigate("/payment-method");
+            }
         } catch (err) {
             console.error("Subscription error:", err);
         } finally {
@@ -88,7 +119,7 @@ export default function ChoosePlan() {
                 {/* Navigation & Stepper Header */}
                 <div className="relative flex items-center justify-center mb-6 sm:mb-8">
                     <button 
-                        onClick={() => navigate("/choose-account-type")} 
+                        onClick={handleBack} 
                         className="absolute left-0 p-2 text-slate-400 hover:text-[#002B49] transition-colors rounded-full hover:bg-slate-100 flex items-center gap-1.5 font-semibold text-sm cursor-pointer"
                         aria-label="Go back"
                     >
@@ -128,8 +159,9 @@ export default function ChoosePlan() {
                 {/* Plan Cards Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto mb-16 sm:mb-20">
                     {plans.map((plan) => {
-                        const isCurrentPlan = isUpgrade && plan.id === currentPlanId;
+                        const isCurrentPlan = isSamePlan(plan);
                         const isSelected = selectedPlanId === plan.id;
+                        const isHigherTier = Number(plan.price) > currentPlanPrice;
                         
                         return (
                             <div
@@ -148,6 +180,16 @@ export default function ChoosePlan() {
                                         <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] break-words">
                                             {plan.name}
                                         </span>
+                                        {isCurrentPlan && (
+                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full shrink-0">
+                                                Current
+                                            </span>
+                                        )}
+                                        {isUpgrade && !isCurrentPlan && isHigherTier && (
+                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-[#002B49]/10 text-[#002B49] px-2 py-0.5 rounded-full shrink-0">
+                                                Upgrade
+                                            </span>
+                                        )}
                                         {isSelected && (
                                             <div className="bg-green-500 text-white p-1 rounded-full shrink-0">
                                                 <Check className="h-3.5 w-3.5 stroke-[3]" />
@@ -201,11 +243,15 @@ export default function ChoosePlan() {
                                                 : "bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600"
                                     }`}
                                 >
-                                    {isCurrentPlan
-                                        ? "Current Plan"
-                                        : isSelected
-                                            ? "Selected Plan"
-                                            : "Choose Plan"}
+                                        {isCurrentPlan
+                                            ? "Current Plan"
+                                            : isSelected
+                                                ? isUpgrade && isHigherTier
+                                                    ? "Upgrade Selected"
+                                                    : "Selected Plan"
+                                                : isUpgrade && isHigherTier
+                                                    ? "Upgrade Plan"
+                                                    : "Choose Plan"}
                                 </button>
                             </div>
                         );
@@ -230,7 +276,7 @@ export default function ChoosePlan() {
                                     <Loader2 className="animate-spin mr-2 h-5 w-5" />
                                 ) : (
                                     <>
-                                        Proceed to Payment
+                                        {isUpgrade ? "Proceed to Upgrade" : "Proceed to Payment"}
                                         <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform shrink-0" />
                                     </>
                                 )}

@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import AuthHeader from "@/components/auth/layout/header/AuthHeader";
+import { storage } from "@/lib/storage";
+import { authApi } from "@/lib/api";
 
 export default function PaymentSuccess() {
     const navigate = useNavigate();
@@ -31,14 +33,21 @@ export default function PaymentSuccess() {
                 {/* Actions */}
                 <div className="w-full max-w-sm space-y-4">
                     <button
-                        onClick={() => navigate("/")}
+                        onClick={() => {
+                            storage.remove("is_upgrading");
+                            authApi.getCurrentUser().catch(() => {});
+                            navigate("/profile?tab=billing");
+                        }}
                         className="w-full h-14 bg-[#002B49] text-white font-bold rounded-2xl shadow-xl shadow-[#002B49]/20 hover:bg-[#001F35] transition-all"
                     >
                         Open App
                     </button>
 
                     <button
-                        onClick={() => navigate("/")}
+                        onClick={() => {
+                            storage.remove("is_upgrading");
+                            navigate("/profile?tab=billing");
+                        }}
                         className="w-full h-14 bg-slate-50 text-slate-600 font-bold rounded-2xl hover:bg-slate-100 transition-all"
                     >
                         Return Later
