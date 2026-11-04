@@ -16,6 +16,127 @@ interface Country {
     code?: string;
 }
 
+type DobParts = {
+    day: string;
+    month: string;
+    year: string;
+};
+
+const MONTHS = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+];
+
+const selectClassName =
+    "w-full h-11 px-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-950 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#002B49]/20 transition-all font-medium text-sm";
+
+function pad(value: number) {
+    return String(value).padStart(2, "0");
+}
+
+function formatIsoDate(date: Date) {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function maxDobIso(from = new Date()) {
+    return formatIsoDate(
+        new Date(from.getFullYear() - 18, from.getMonth(), from.getDate()),
+    );
+}
+
+function formatLongDate(iso: string) {
+    const [year, month, day] = iso.split("-").map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+function daysInMonth(year: number, month: number) {
+    return new Date(year, month, 0).getDate();
+}
+
+function splitDob(iso: string): DobParts {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    if (!match) return { year: "", month: "", day: "" };
+    return { year: match[1], month: match[2], day: match[3] };
+}
+
+function composedDob(parts: DobParts) {
+    if (!parts.year || !parts.month || !parts.day) return "";
+    const year = Number(parts.year);
+    const month = Number(parts.month);
+    const day = Number(parts.day);
+    const date = new Date(year, month - 1, day);
+    if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+    ) {
+        return "";
+    }
+    return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+function clampDobParts(parts: DobParts, limit: string): DobParts {
+    const next = { ...parts };
+    const limitYear = limit.slice(0, 4);
+    const limitMonth = limit.slice(5, 7);
+    const limitDay = limit.slice(8, 10);
+
+    if (next.year === limitYear && next.month && next.month > limitMonth) {
+        next.month = "";
+        next.day = "";
+    }
+
+    if (next.year && next.month && next.day) {
+        const maxDay = daysInMonth(Number(next.year), Number(next.month));
+        if (
+            Number(next.day) > maxDay ||
+            (next.year === limitYear &&
+                next.month === limitMonth &&
+                next.day > limitDay)
+        ) {
+            next.day = "";
+        }
+    }
+
+    return next;
+}
+
+function dobErrorMessage(limit: string) {
+    return `Enter a date of birth on or before ${formatLongDate(limit)}. You must be 18 or older.`;
+}
+
+function readDobError(data: {
+    message?: string;
+    errors?: { dob?: string | string[] };
+}) {
+    const dob = data?.errors?.dob;
+    if (typeof dob === "string") return dob;
+    if (Array.isArray(dob) && typeof dob[0] === "string") return dob[0];
+    if (typeof data?.message === "string" && /dob/i.test(data.message)) {
+        return data.message;
+    }
+    return null;
+}
+
+function parseDobLimit(message: string) {
+    const match = message.match(/before or equal to (\d{4}-\d{2}-\d{2})/i);
+    return match?.[1] ?? null;
+}
+
 export default function RegisterPage() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -59,6 +180,10 @@ export default function RegisterPage() {
         password_confirmation: "",
         referral_code: initialRef,
     });
+    const [dobLimit, setDobLimit] = useState(maxDobIso);
+    const [dobParts, setDobParts] = useState<DobParts>(() =>
+        splitDob(formData.dob),
+    );
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -166,6 +291,31 @@ export default function RegisterPage() {
         });
     };
 
+    const updateDob = (part: keyof DobParts, value: string) => {
+        const next = clampDobParts({ ...dobParts, [part]: value }, dobLimit);
+        const iso = composedDob(next);
+        setDobParts(next);
+        setFormData((prev) => ({ ...prev, dob: iso }));
+        if (iso && iso <= dobLimit) {
+            setError((current) =>
+                current && /birth|dob/i.test(current) ? null : current,
+            );
+        }
+    };
+
+    useEffect(() => {
+        const next = clampDobParts(dobParts, dobLimit);
+        if (
+            next.day === dobParts.day &&
+            next.month === dobParts.month &&
+            next.year === dobParts.year
+        ) {
+            return;
+        }
+        setDobParts(next);
+        setFormData((prev) => ({ ...prev, dob: composedDob(next) }));
+    }, [dobLimit, dobParts]);
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -179,6 +329,13 @@ export default function RegisterPage() {
 
         if (formData.password !== formData.password_confirmation) {
             setError("Passwords do not match.");
+            setLoading(false);
+            return;
+        }
+
+        if (!formData.dob || formData.dob > dobLimit) {
+            setError(dobErrorMessage(dobLimit));
+            setStep(2);
             setLoading(false);
             return;
         }
@@ -207,10 +364,25 @@ export default function RegisterPage() {
             toast.success("Login OTP sent to your email!");
             setStep(4);
         } catch (err: any) {
-            setError(
-                err.response?.data?.message ||
-                    "Registration failed. Please check your inputs and try again.",
-            );
+            const responseData = err.response?.data;
+            const dobError = readDobError(responseData);
+            if (dobError) {
+                const serverLimit = parseDobLimit(dobError);
+                const limit =
+                    serverLimit && serverLimit < dobLimit
+                        ? serverLimit
+                        : dobLimit;
+                if (serverLimit && serverLimit < dobLimit) {
+                    setDobLimit(serverLimit);
+                }
+                setError(dobErrorMessage(limit));
+                setStep(2);
+            } else {
+                setError(
+                    responseData?.message ||
+                        "Registration failed. Please check your inputs and try again.",
+                );
+            }
         } finally {
             setLoading(false);
         }
@@ -249,6 +421,18 @@ export default function RegisterPage() {
             setLoading(false);
         }
     };
+
+    const limitYear = Number(dobLimit.slice(0, 4));
+    const selectedYear = Number(dobParts.year);
+    const firstDobYear = selectedYear > limitYear ? selectedYear : limitYear;
+    const dobYears: number[] = [];
+    for (let year = firstDobYear; year >= limitYear - 100; year -= 1) {
+        dobYears.push(year);
+    }
+    const dobDayCount =
+        dobParts.year && dobParts.month
+            ? daysInMonth(Number(dobParts.year), Number(dobParts.month))
+            : 31;
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center pt-8 pb-16 px-4 font-sans">
@@ -407,6 +591,13 @@ export default function RegisterPage() {
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
+                                const iso = composedDob(dobParts);
+                                if (!iso || iso > dobLimit) {
+                                    setError(dobErrorMessage(dobLimit));
+                                    return;
+                                }
+                                setFormData((prev) => ({ ...prev, dob: iso }));
+                                setError(null);
                                 setStep(3);
                             }}
                             className="space-y-5"
@@ -499,40 +690,130 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1.5">
-                                    <Label
-                                        htmlFor="dob"
-                                        className="text-slate-700 font-medium"
-                                    >
-                                        Date of Birth
-                                    </Label>
-                                    <Input
-                                        id="dob"
-                                        type="date"
+                            <div className="space-y-1.5">
+                                <Label className="text-slate-700 font-medium">
+                                    Date of Birth
+                                </Label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <select
+                                        aria-label="Day"
                                         required
-                                        value={formData.dob}
-                                        onChange={handleInputChange}
-                                        className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label
-                                        htmlFor="phone"
-                                        className="text-slate-700 font-medium"
+                                        value={dobParts.day}
+                                        onChange={(e) =>
+                                            updateDob("day", e.target.value)
+                                        }
+                                        className={selectClassName}
                                     >
-                                        Phone Number
-                                    </Label>
-                                    <Input
-                                        id="phone"
-                                        type="tel"
+                                        <option value="" disabled>
+                                            Day
+                                        </option>
+                                        {Array.from(
+                                            { length: dobDayCount },
+                                            (_, index) => {
+                                                const value = pad(index + 1);
+                                                const afterLimit =
+                                                    dobParts.year ===
+                                                        dobLimit.slice(0, 4) &&
+                                                    dobParts.month ===
+                                                        dobLimit.slice(5, 7) &&
+                                                    value > dobLimit.slice(8, 10);
+                                                return (
+                                                    <option
+                                                        key={value}
+                                                        value={value}
+                                                        disabled={afterLimit}
+                                                    >
+                                                        {value}
+                                                    </option>
+                                                );
+                                            },
+                                        )}
+                                    </select>
+                                    <select
+                                        aria-label="Month"
                                         required
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                        placeholder="e.g. +2348000000000"
-                                        className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
-                                    />
+                                        value={dobParts.month}
+                                        onChange={(e) =>
+                                            updateDob("month", e.target.value)
+                                        }
+                                        className={selectClassName}
+                                    >
+                                        <option value="" disabled>
+                                            Month
+                                        </option>
+                                        {MONTHS.map((name, index) => {
+                                            const value = pad(index + 1);
+                                            const afterLimit =
+                                                dobParts.year ===
+                                                    dobLimit.slice(0, 4) &&
+                                                value > dobLimit.slice(5, 7);
+                                            return (
+                                                <option
+                                                    key={value}
+                                                    value={value}
+                                                    disabled={afterLimit}
+                                                >
+                                                    {name}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    <select
+                                        aria-label="Year"
+                                        required
+                                        value={dobParts.year}
+                                        onChange={(e) =>
+                                            updateDob("year", e.target.value)
+                                        }
+                                        className={selectClassName}
+                                    >
+                                        <option value="" disabled>
+                                            Year
+                                        </option>
+                                        {dobYears.map((year) => (
+                                            <option
+                                                key={year}
+                                                value={String(year)}
+                                                disabled={
+                                                    year > limitYear &&
+                                                    String(year) !==
+                                                        dobParts.year
+                                                }
+                                            >
+                                                {year}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
+                                <p
+                                    className={`text-xs ${
+                                        formData.dob && formData.dob > dobLimit
+                                            ? "text-red-600"
+                                            : "text-slate-500"
+                                    }`}
+                                >
+                                    {formData.dob && formData.dob > dobLimit
+                                        ? dobErrorMessage(dobLimit)
+                                        : `You must be 18 or older, born on or before ${formatLongDate(dobLimit)}.`}
+                                </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label
+                                    htmlFor="phone"
+                                    className="text-slate-700 font-medium"
+                                >
+                                    Phone Number
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    value={formData.phone || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. +2348000000000"
+                                    className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                                />
                             </div>
 
                             <div className="space-y-1.5">
