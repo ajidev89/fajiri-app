@@ -40,6 +40,7 @@ export default function ResetPassword() {
             await authApi.changePassword({
                 token,
                 password,
+                password_confirmation: confirmPassword,
             });
             setSuccess(true);
         } catch (err: any) {

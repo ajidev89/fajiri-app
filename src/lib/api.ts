@@ -108,7 +108,11 @@ export const authApi = {
         return response.data.data; // contains the token needed for change-password
     },
 
-    changePassword: async (data: { token: string; password: string }) => {
+    changePassword: async (data: {
+        token: string;
+        password: string;
+        password_confirmation: string;
+    }) => {
         return await api.post("/auth/change-password", data);
     },
 
